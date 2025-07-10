@@ -1,0 +1,3800 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>KnowEmpire Marketplace</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <!-- Combined font imports: Inter for general text, Montserrat for titles -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Montserrat:wght@700;900&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --primary: #7c3aed;
+      --primary-dark: #5b21b6;
+      --background: #f8f6ff;
+      --white: #fff;
+      --text: #2d1a4a;
+      --muted: #a78bfa;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --error: #ef4444;
+    }
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%; /* Ensure html and body take full height */
+      width: 100vw;
+      overflow: hidden; /* Initial for welcome page to prevent scroll issues during animation */
+      font-family: 'Inter', sans-serif; /* Default font for the entire app */
+      color: var(--text); /* Default text color from main app */
+    }
+
+    /* Welcome Page Styles */
+    .welcome-container {
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: absolute; /* Use absolute to cover the whole viewport */
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      z-index: 1000; /* Ensure it's on top initially */
+      transition: opacity 0.5s ease-out; /* Smooth transition out */
+    }
+    .welcome-container.hidden {
+      opacity: 0;
+      pointer-events: none; /* Disable interactions when hidden */
+    }
+    .welcome-content {
+      z-index: 10;
+      position: relative;
+      text-align: center;
+      color: var(--white);
+      animation: fadeIn 1.5s ease-out forwards;
+      max-width: 90vw;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .logo-box {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100px;
+      height: 100px;
+      background-color: rgba(255, 255, 255, 0.2);
+      border-radius: 20px;
+      margin-bottom: 20px;
+      animation: float 4s ease-in-out infinite;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    }
+    .logo-box img {
+      max-width: 80%;
+      max-height: 80%;
+      object-fit: contain;
+      filter: none; /* Show original logo color */
+    }
+    .welcome-title {
+      font-family: 'Montserrat', sans-serif; /* Applied new font */
+      font-size: 4rem;
+      font-weight: 900;
+      margin-bottom: 10px;
+      letter-spacing: 2px;
+      animation: float 4s ease-in-out infinite 0.5s;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+      color: var(--white);
+    }
+    .welcome-subtitle {
+      font-size: 1.5rem;
+      margin-bottom: 40px;
+      animation: fadeIn 2s ease-out forwards 0.5s;
+      opacity: 0;
+    }
+
+    /* Enter Button Styling */
+    .enter-button {
+      background-color: var(--warning); /* Using --warning for consistency */
+      color: var(--white);
+      padding: 15px 40px;
+      border-radius: 10px;
+      font-size: 1.25rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background-color 0.3s ease, transform 0.3s ease;
+      box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4);
+      margin-top: 30px;
+      animation: fadeIn 2s ease-out forwards 0.8s;
+      opacity: 0;
+      border: none; /* Ensure no default button border */
+    }
+    .enter-button:hover {
+      background-color: #eab308; /* Darker accent on hover */
+      transform: translateY(-3px);
+    }
+
+    /* Animated Background Shapes */
+    .shape {
+      position: absolute;
+      background-color: rgba(255, 255, 255, 0.1);
+      border-radius: 50%;
+      animation: float 6s ease-in-out infinite alternate, spin 12s linear infinite;
+    }
+    .shape-small {
+      width: 80px; height: 80px; top: 10%; left: 5%; animation-delay: 0s;
+    }
+    .shape-medium-1 {
+      width: 120px; height: 120px; bottom: 15%; right: 10%; animation-delay: 1.5s; animation-duration: 7s;
+    }
+    .shape-medium-2 {
+      width: 100px; height: 100px; top: 20%; right: 20%; animation-delay: 2.5s; animation-duration: 5s; border-radius: 30%; background-color: rgba(255, 255, 255, 0.15);
+    }
+    .shape-large {
+      width: 150px; height: 150px; bottom: 5%; left: 20%; animation-delay: 3s; animation-duration: 8s; background-color: rgba(255, 255, 255, 0.08);
+    }
+
+    /* Canvas for Lightning */
+    .lightning-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1; /* Behind main content */
+      pointer-events: none; /* Allows clicks to pass through */
+    }
+
+    /* Keyframe Animations (Combined) */
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes float {
+        0% { transform: translateY(0px); }
+        50% { transform: translateY(-10px); }
+        100% { transform: translateY(0px); }
+    }
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    /* Main App Content Styles */
+    /* New class for body when main app is active */
+    body.main-app-active {
+        overflow-y: auto; /* Allow scrolling on the body itself */
+        display: flex;
+        flex-direction: column; /* Main content flows vertically */
+    }
+
+    #main-app-content {
+      display: none; /* Hidden by default until welcome screen dismisses */
+      background: var(--background); /* Consistent background for main app */
+      flex-grow: 1; /* Takes up available vertical space in body flex container */
+      padding-bottom: 90px; /* Space for the fixed bottom navigation */
+      box-sizing: border-box; /* Include padding in height calculation */
+      position: relative; /* Needed for sticky top bar to work within it */
+    }
+    .container {
+      max-width: 420px;
+      margin: 0 auto;
+      background: var(--white);
+      border-radius: 18px;
+      box-shadow: 0 2px 16px #7c3aed22;
+      padding: 28px 5vw 24px 5vw;
+      margin-top: 24px; /* Ensure space from top of main app content (or sticky header) */
+      margin-bottom: 24px; /* Space before bottom nav */
+    }
+    h1 {
+      font-size: 2rem;
+      font-weight: bold;
+      margin-bottom: 14px;
+      color: var(--primary-dark);
+      text-align: center;
+      letter-spacing: -1px;
+    }
+    .subtext {
+      font-size: 1.1rem;
+      color: var(--primary);
+      margin-bottom: 28px;
+      text-align: center;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid var(--muted);
+      margin: 28px 0;
+    }
+    .explainer {
+      font-size: 1rem;
+      margin-bottom: 28px;
+      color: var(--text);
+      text-align: center;
+    }
+    .cta-btn {
+      width: 100%;
+      background: var(--primary);
+      color: var(--white);
+      border: none;
+      border-radius: 10px;
+      font-size: 1.15rem;
+      font-weight: bold;
+      padding: 15px 0;
+      margin-bottom: 14px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .cta-btn:active {
+      background: var(--primary-dark);
+    }
+    .addon {
+      text-align: center;
+      margin-bottom: 28px;
+      font-size: 1rem;
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .addon a, .addon button {
+      color: var(--primary-dark);
+      font-weight: bold;
+      text-decoration: underline;
+      cursor: pointer;
+      background: none;
+      border: none;
+      font-size: 1rem;
+      padding: 0 8px;
+    }
+    .addon button {
+      color: var(--white);
+      background: var(--primary);
+      border-radius: 8px;
+      font-weight: bold;
+      text-decoration: none;
+      padding: 7px 16px;
+      border: none;
+      margin-left: 0;
+      transition: background 0.2s;
+    }
+    .addon button:active {
+      background: var(--primary-dark);
+    }
+    .footer {
+      font-size: 0.9rem;
+      color: var(--muted);
+      text-align: center;
+      margin-top: 18px;
+    }
+    /* General Modal styles */
+    .modal-bg {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0; top: 0; width: 100vw; height: 100vh;
+      background: rgba(124,58,237,0.10);
+      justify-content: center;
+      align-items: center;
+      overflow-y: auto; /* Allow scrolling for taller modals */
+    }
+    .modal-bg.active { display: flex; }
+    .form-container {
+      background: var(--white);
+      border-radius: 16px;
+      box-shadow: 0 2px 16px #7c3aed33;
+      padding: 24px 6vw 18px 6vw;
+      max-width: 95vw;
+      width: 400px;
+      position: relative;
+      margin: 0 2vw;
+    }
+    .close-btn {
+      position: absolute;
+      right: 16px;
+      top: 12px;
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      color: var(--primary-dark);
+      cursor: pointer;
+    }
+    h2 {
+      font-size: 1.25rem;
+      font-weight: bold;
+      margin-bottom: 20px;
+      color: var(--primary-dark);
+      text-align: center;
+    }
+    label {
+      font-size: 1rem;
+      color: var(--primary-dark);
+      margin-bottom: 5px;
+      display: block;
+      font-weight: 500;
+    }
+    .input, select, textarea {
+      width: 100%;
+      padding: 11px;
+      border: 1px solid var(--muted);
+      border-radius: 8px;
+      font-size: 1rem;
+      margin-bottom: 16px;
+      background: var(--background);
+      color: var(--text);
+      box-sizing: border-box;
+    }
+    .input:focus, select:focus, textarea:focus {
+      outline: 2px solid var(--primary);
+      border-color: var(--primary);
+    }
+    .radio-group {
+      margin-bottom: 16px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .radio-group label {
+      display: flex;
+      align-items: center;
+      font-weight: normal;
+      color: var(--text);
+      background: var(--background);
+      border-radius: 6px;
+      padding: 4px 10px;
+      border: 1px solid var(--muted);
+      cursor: pointer;
+      font-size: 0.98rem;
+    }
+    .radio-group input[type="radio"] {
+      margin-right: 6px;
+      accent-color: var(--primary);
+    }
+    .checkbox-row {
+      margin-bottom: 20px;
+      font-size: 0.98rem;
+      color: var(--text);
+    }
+    .checkbox-row input[type="checkbox"] {
+      accent-color: var(--primary);
+      margin-right: 6px;
+    }
+    .register-btn {
+      width: 100%;
+      background: var(--primary-dark);
+      color: var(--white);
+      border: none;
+      border-radius: 10px;
+      font-size: 1.08rem;
+      font-weight: bold;
+      padding: 13px 0;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .register-btn:active {
+      background: var(--primary);
+    }
+    /* Seller Dashboard */
+    .dashboard {
+      width: 100%;
+      max-width: 420px;
+      margin: 0 auto;
+      text-align: center;
+      padding: 32px 0 0 0;
+    }
+    .dashboard h2 {
+      color: var(--primary-dark);
+      margin-bottom: 18px;
+    }
+    /* Post Section */
+    .post-section {
+      max-width: 420px;
+      margin: 0 auto;
+      padding: 0 4vw 90px 4vw; /* Ensure padding for bottom nav */
+      display: none;
+    }
+    .post-form {
+      background: var(--white);
+      border-radius: 16px;
+      box-shadow: 0 2px 16px #7c3aed22;
+      padding: 18px 14px 14px 14px;
+      margin-bottom: 22px;
+    }
+    .post-form label {
+      font-size: 1rem;
+      color: var(--primary-dark);
+      margin-bottom: 5px;
+      display: block;
+      font-weight: 500;
+    }
+    .post-form input, .post-form textarea, .post-form select {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid var(--muted);
+      border-radius: 8px;
+      font-size: 1rem;
+      margin-bottom: 14px;
+      background: var(--background);
+      color: var(--text);
+      box-sizing: border-box;
+    }
+    .post-form button {
+      width: 100%;
+      background: var(--primary);
+      color: var(--white);
+      border: none;
+      border-radius: 10px;
+      font-size: 1.08rem;
+      font-weight: bold;
+      padding: 12px 0;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .post-form button:active {
+      background: var(--primary-dark);
+    }
+    .product-list {
+      margin-top: 10px;
+    }
+    .product-card {
+      background: var(--white);
+      border-radius: 12px;
+      box-shadow: 0 1px 8px #7c3aed11;
+      padding: 14px 12px 10px 12px;
+      margin-bottom: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      position: relative;
+    }
+    .product-title {
+      font-weight: bold;
+      color: var(--primary-dark);
+      font-size: 1.08rem;
+    }
+    .product-desc {
+      font-size: 0.98rem;
+      margin: 2px 0 6px 0;
+      color: #444;
+    }
+    .product-meta {
+      font-size: 0.97rem;
+      color: var(--primary);
+      margin-bottom: 4px;
+    }
+    .delete-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+    .delete-btn:active {
+      color: var(--error);
+    }
+    /* Bottom nav */
+    .bottom-nav {
+      position: fixed;
+      left: 50%;
+      transform: translateX(-50%);
+      bottom: 0;
+      width: 100vw;
+      background: var(--white);
+      border-top: 1px solid var(--muted);
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      padding: 0 0 8px 0;
+      z-index: 100;
+      height: 70px;
+      max-width: 420px;
+      border-top-left-radius: 18px;
+      border-top-right-radius: 18px;
+      box-shadow: 0 -2px 16px #7c3aed22;
+    }
+    .nav-btn {
+      flex: 1;
+      background: none;
+      border: none;
+      color: #444;
+      font-size: 1rem;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      cursor: pointer;
+      transition: color 0.2s;
+      height: 100%;
+      justify-content: center;
+      border-radius: 0;
+      position: relative; /* Added for badge positioning */
+    }
+    .nav-btn .material-icons {
+      font-size: 2rem;
+      margin-bottom: 2px;
+      color: #444;
+      transition: color 0.2s;
+    }
+    .nav-btn span.label {
+      font-size: 0.92rem;
+      margin-top: 2px;
+      color: #444;
+      font-weight: 500;
+      letter-spacing: 0.01em;
+      transition: color 0.2s, font-weight 0.2s;
+    }
+    .nav-btn.active .material-icons,
+    .nav-btn:active .material-icons {
+      color: #111;
+    }
+    .nav-btn.active span.label,
+    .nav-btn:active span.label {
+      color: #111;
+      font-weight: 700;
+    }
+    .nav-btn:focus {
+      outline: none;
+    }
+    /* Hide all dashboard sections by default */
+    .dashboard-section {
+      display: none;
+      max-width: 420px;
+      margin: 0 auto;
+      padding: 0 0 0 0; /* Adjusted padding, will be handled by product lists */
+      width: 100%; /* Ensure it takes full width of its parent */
+      box-sizing: border-box; /* Include padding in height calculation */
+      flex-grow: 1; /* Allows it to expand within main-app-content */
+    }
+    .dashboard-section.active {
+      display: block;
+    }
+    .fab {
+      position: fixed;
+      bottom: 90px;
+      right: 24px;
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: var(--primary);
+      color: var(--white);
+      border: none;
+      box-shadow: 0 2px 8px #7c3aed44;
+      font-size: 2.3rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 200;
+      transition: background 0.2s;
+    }
+    .fab:active {
+      background: var(--primary-dark);
+    }
+    .modal-form-bg {
+      display: none;
+      position: fixed;
+      z-index: 2000;
+      left: 0; top: 0; width: 100vw; height: 100vh;
+      background: rgba(44, 19, 100, 0.12);
+      justify-content: center;
+      align-items: center;
+      overflow-y: auto;
+    }
+    .modal-form-bg.active { display: flex; }
+    .modal-form {
+      background: var(--white);
+      border-radius: 16px;
+      box-shadow: 0 2px 16px #7c3aed33;
+      padding: 22px 6vw 18px 6vw;
+      max-width: 95vw;
+      width: 400px;
+      position: relative;
+      margin: 0 2vw;
+      animation: fadeIn 0.2s;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(30px);}
+      to { opacity: 1; transform: translateY(0);}
+    }
+    .modal-form .close-btn {
+      position: absolute;
+      right: 16px;
+      top: 12px;
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      color: var(--primary-dark);
+      cursor: pointer;
+    }
+    .image-preview {
+      width: 100%;
+      max-height: 180px;
+      object-fit: contain;
+      border-radius: 10px;
+      margin-bottom: 12px;
+      background: var(--background);
+      display: none;
+    }
+    .product-image {
+      width: 100%;
+      height: auto;
+      max-height: 320px;
+      object-fit: contain;
+      border-radius: 8px;
+      margin-bottom: 8px;
+      background: var(--background);
+      display: block;
+    }
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .welcome-title {
+            font-size: 2.8rem;
+            letter-spacing: 1px;
+        }
+        .logo-box {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 15px;
+        }
+        .welcome-subtitle {
+            font-size: 1.1rem;
+        }
+        .enter-button {
+            padding: 12px 30px;
+            font-size: 1.1rem;
+        }
+    }
+    @media (max-width: 600px) {
+      .container, .form-container, .dashboard, .dashboard-section, .modal-form {
+        padding: 12px 2vw 12px 2vw; /* Adjusted for smaller screens */
+        border-radius: 12px;
+      }
+      h1 { font-size: 1.3rem; }
+      h2 { font-size: 1.05rem; }
+      /* Further responsive adjustments for welcome page */
+      .welcome-title {
+          font-size: 2.5rem;
+          letter-spacing: 0.8px;
+      }
+      .logo-box {
+          width: 70px;
+          height: 70px;
+          margin-bottom: 10px;
+      }
+      .welcome-subtitle {
+          font-size: 1rem;
+          margin-bottom: 25px;
+      }
+      .enter-button {
+          padding: 10px 25px;
+          font-size: 1rem;
+      }
+    }
+    @media (max-width: 480px) {
+      .welcome-title {
+          font-size: 2rem;
+          letter-spacing: 0.5px;
+      }
+      .logo-box {
+          width: 60px;
+          height: 60px;
+          margin-bottom: 10px;
+      }
+      .welcome-subtitle {
+          font-size: 0.9rem;
+          margin-bottom: 20px;
+      }
+      .enter-button {
+          padding: 8px 20px;
+          font-size: 0.9rem;
+      }
+    }
+
+    .menu-item {
+      background: var(--white);
+      border: 1px solid #eee;
+      border-radius: 10px;
+      padding: 14px 18px;
+      font-size: 1.07rem;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      transition: background 0.18s, box-shadow 0.18s;
+      box-shadow: 0 1px 6px #7c3aed11;
+      position: relative; /* Added for badge positioning */
+    }
+    .menu-item:active {
+      background: #f3e8ff;
+    }
+    /* Dark mode support */
+    body.dark-theme {
+      background: #181028;
+      color: #f3e8ff;
+    }
+    body.dark-theme .container,
+    body.dark-theme .form-container,
+    body.dark-theme .dashboard,
+    body.dark-theme .post-section,
+    body.dark-theme .dashboard-section,
+    body.dark-theme .modal-form,
+    body.dark-theme #product-modal {
+      background: #241a3a !important;
+      color: #f3e8ff !important;
+    }
+    body.dark-theme .menu-item {
+      background: #2d1a4a !important;
+      color: #f3e8ff !important;
+      border-color: #3b2c5a !important;
+    }
+    .category-tabs {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 18px;
+      padding: 0 4vw; /* Ensure tabs are within bounds */
+      box-sizing: border-box;
+    }
+    .category-tab {
+      background: none;
+      border: none;
+      font-size: 1.08rem;
+      font-weight: 600;
+      color: var(--primary-dark);
+      padding: 8px 22px;
+      border-radius: 22px;
+      transition: background 0.18s, color 0.18s;
+      cursor: pointer;
+    }
+    .category-tab.active {
+      background: var(--primary);
+      color: var(--white);
+    }
+    .product-list-stacked {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      margin-top: 10px;
+      padding: 0 4vw; /* Consistent padding with browse list */
+    }
+    .product-card-stacked { /* Used for both seller's own products AND buyer's view */
+      background: var(--white);
+      border-radius: 18px;
+      box-shadow: 0 2px 16px #7c3aed11;
+      padding: 14px 12px;
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+      position: relative;
+    }
+    .product-card-stacked img {
+      width: 80px; /* Adjusted for better visibility in buyer view */
+      height: 80px; /* Adjusted for better visibility in buyer view */
+      object-fit: contain;
+      border-radius: 12px;
+      background: var(--background);
+      flex-shrink: 0;
+    }
+    .product-card-info {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .product-title {
+      font-weight: bold;
+      color: var(--text);
+      font-size: 1.08rem;
+      margin-bottom: 2px;
+    }
+    .product-badges {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 2px;
+    }
+    .badge {
+      font-size: 0.85rem;
+      background: var(--background);
+      color: var(--primary);
+      border-radius: 8px;
+      padding: 2px 10px;
+      font-weight: 600;
+    }
+    .badge.goods { background: #e0e7ff; color: #6366f1; }
+    .badge.digital { background: #fef9c3; color: #eab308; }
+    .badge.services { background: #f3e8ff; color: var(--primary); }
+    .product-meta {
+      font-size: 1rem;
+      color: var(--primary-dark);
+      font-weight: 600;
+      margin-bottom: 2px;
+    }
+    .product-location {
+      font-size: 0.97rem;
+      color: #888;
+      margin-left: 8px;
+      font-weight: 400;
+    }
+    .product-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 8px;
+      width: 100%;
+    }
+    .product-actions button {
+      flex: 1;
+      background: var(--primary);
+      color: var(--white);
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: bold;
+      padding: 7px 0;
+      cursor: pointer;
+      transition: background 0.18s;
+    }
+    .product-actions .delete-btn { /* Seller's delete button */
+      background: var(--white);
+      color: var(--error);
+      border: 1.5px solid var(--error);
+      font-weight: 600;
+    }
+    .product-actions .chat-seller-btn { /* Buyer's chat button */
+        background: #e0e7ff; /* Lighter background for chat */
+        color: #6366f1;
+        border: none;
+    }
+    @media (max-width: 600px) {
+      .product-card-stacked img { width: 54px; height: 54px; }
+      .product-actions { flex-direction: row; } /* Ensure buttons stay in a row on small screens */
+    }
+    .referral-bg {
+      padding: 32px 12px 24px 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: none;
+      min-height: unset;
+    }
+    .referral-header {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 18px;
+    }
+    .referral-icon {
+      width: 48px;
+      height: 48px;
+      margin-bottom: 8px;
+    }
+    .referral-title {
+      font-size: 1.35rem;
+      font-weight: bold;
+      letter-spacing: 1px;
+      margin-bottom: 8px;
+      text-align: center;
+    }
+    .referral-balance-box {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--white);
+      border: 3px solid #111;
+      border-radius: 18px;
+      padding: 12px 18px;
+      width: 100%;
+      max-width: 350px;
+      font-size: 1.3rem;
+      font-weight: bold;
+      margin-bottom: 12px;
+      box-sizing: border-box;
+    }
+    .referral-balance {
+      color: #111;
+      font-family: monospace, monospace;
+      font-size: 1.3rem;
+      letter-spacing: 1px;
+    }
+    .referral-claim-btn {
+      background: #e5e5e5;
+      color: #aaa;
+      border: none;
+      border-radius: 10px;
+      font-size: 1.1rem;
+      font-weight: bold;
+      padding: 7px 22px;
+      margin-left: 18px;
+      cursor: not-allowed;
+    }
+    .referral-desc {
+      font-size: 1.02rem;
+      color: #222;
+      text-align: center;
+      margin-bottom: 32px;
+      margin-top: 8px;
+    }
+    .referral-invite-btn {
+      width: 100%;
+      max-width: 350px;
+      background: #111;
+      color: #fff;
+      border: none;
+      border-radius: 18px;
+      font-size: 1.15rem;
+      font-weight: bold;
+      padding: 15px 0;
+      margin-top: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      letter-spacing: 1px;
+      box-shadow: 0 2px 8px #00000011;
+      transition: background 0.18s;
+    }
+    .referral-invite-btn:active {
+      background: #222;
+    }
+    @media (max-width: 600px) {
+      .referral-bg {
+        padding: 18px 4vw 90px 4vw;
+      }
+      .referral-balance-box, .referral-invite-btn {
+        max-width: 100%;
+      }
+    }
+    /* Profile Overlay */
+    .profile-overlay {
+      display: none;
+      position: fixed;
+      z-index: 3000;
+      left: 0; top: 0; width: 100vw; height: 100vh;
+      background: rgba(0,0,0,0.10);
+      justify-content: center;
+      align-items: flex-start;
+      overflow-y: auto;
+    }
+    .profile-overlay.active {
+      display: flex;
+    }
+    .profile-card {
+      background: radial-gradient(circle at 50% 30%,   #e5e5e5 0%,   #e5e5e5 100%);
+      border-radius: 28px;
+      margin: 32px 8px 24px 8px;
+      width: 100%;
+      max-width: 420px;
+      box-shadow: 0 4px 32px #0002;
+      position: relative;
+      padding: 0 0 32px 0;
+      overflow: hidden;
+    }
+    .profile-close { /* Hidden by default, only shown if explicitly needed */
+      display: none; /* Hide the X button */
+      position: absolute;
+      right: 18px;
+      top: 18px;
+      background: #fff;
+      border: none;
+      border-radius: 50%;
+      width: 36px;
+      height: 36px;
+      font-size: 1.7rem;
+      color: #222;
+      cursor: pointer;
+      z-index: 2;
+      box-shadow: 0 2px 8px #0001;
+    }
+    .profile-header {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 38px 0 0 0;
+    }
+    .profile-avatar-bg {
+      background: #fff;
+      border-radius: 50%;
+      padding: 8px;
+      margin-bottom: 10px;
+      box-shadow: 0 2px 8px #0001;
+    }
+    .profile-avatar {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: #fff;
+    }
+    .profile-username {
+      font-size: 1.25rem;
+      font-weight: bold;
+      letter-spacing: 1px;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+    .profile-wallet {
+      display: flex;
+      align-items: center;
+      background: #111;
+      color: #fff;
+      border-radius: 18px;
+      padding: 6px 18px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      gap: 8px;
+      margin-bottom: 18px;
+    }
+    .profile-wallet-icon,
+    .profile-wallet-action {
+      font-size: 1.2em;
+    }
+    .profile-wallet-action {
+      margin-left: 8px;
+      cursor: pointer;
+    }
+    .profile-tabs {
+      display: flex;
+      justify-content: center;
+      gap: 0;
+      margin-bottom: 18px;
+    }
+    .profile-tab {
+      flex: 1;
+      background: none;
+      border: none;
+      font-size: 1.08rem;
+      font-weight: 700;
+      color: #111;
+      padding: 10px 0;
+      border-bottom: 3px solid transparent;
+      transition: border-color 0.18s, color 0.18s;
+      cursor: pointer
+    }
+    .profile-tab.active {
+      border-bottom: 3px solid #f9c900;
+      color: #111;
+    }
+    .profile-assets-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #222;
+      text-align: left;
+      margin-left: 24px;
+      margin-bottom: 2px;
+    }
+    .profile-assets-sub {
+      font-size: 0.98rem;
+      color: #444;
+      margin-left: 24px;
+      margin-bottom: 14px;
+    }
+    .profile-assets-row {
+      display: flex;
+      gap: 14px;
+      justify-content: center;
+      margin: 0 14px;
+    }
+    .profile-asset-card {
+      background: var(--white);
+      border-radius: 18px;
+      border: 2.5px solid #111;
+      flex: 1;
+      min-width: 0;
+      padding: 18px 10px 12px 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      box-shadow: 0 2px 8px #0001;
+    }
+    .profile-asset-icon {
+      width: 32px;
+      height: 32px;
+      margin-bottom: 8px;
+    }
+    .profile-asset-label {
+      font-size: 1.02rem;
+      color: #222;
+      margin-bottom: 4px;
+      font-weight: 600;
+    }
+    .profile-asset-value {
+      font-size: 1.18rem;
+      font-family: monospace, monospace;
+      color: #111;
+      font-weight: bold;
+    }
+    @media (max-width: 600px) {
+      .profile-card {
+        margin: 18px 2vw 18px 2vw;
+        border-radius: 18px;
+        padding-bottom: 18px;
+      }
+      .profile-assets-row {
+        gap: 8px;
+        margin: 0 2vw;
+      }
+      .profile-asset-card {
+        padding: 12px 4px 10px 4px;
+        border-radius: 12px;
+      }
+    }
+    .connect-wallet-btn {
+      background: var(--primary);
+      color: var(--white);
+      border: none;
+      border-radius: 12px;
+      font-size: 1.08rem;
+      font-weight: bold;
+      padding: 10px 22px;
+      margin-top: 10px;
+      cursor: pointer;
+      transition: background 0.18s;
+    }
+    .connect-wallet-btn:active {
+      background: var(--primary-dark);
+    }
+    /* Styles for the new "Browse Products" section for buyers */
+    .buyer-product-list {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        padding: 0 4vw; /* Removed bottom padding, handled by main-app-content */
+    }
+    .buyer-product-card { /* Reusing product-card-stacked for consistency */
+        background: var(--white);
+        border-radius: 12px;
+        box-shadow: 0 1px 8px #7c3aed11;
+        padding: 10px;
+        text-align: left;
+        display: flex;
+        gap: 10px;
+        align-items: flex-start;
+        cursor: pointer; /* Make the entire card clickable */
+    }
+    .buyer-product-card img {
+        width: 80px; /* Consistent with seller's list */
+        height: 80px; /* Consistent with seller's list */
+        object-fit: cover;
+        border-radius: 8px;
+        background: var(--background);
+        flex-shrink: 0;
+    }
+    .buyer-product-card-content {
+        flex: 1;
+    }
+    .buyer-product-card .product-title {
+        font-size: 1.1rem;
+        margin-bottom: 2px;
+        color: var(--text); /* Ensure good contrast */
+    }
+    .buyer-product-card .product-badges {
+        margin-bottom: 5px;
+        display: flex;
+        gap: 5px;
+    }
+    .buyer-product-card .badge {
+        font-size: 0.8rem;
+        padding: 2px 8px;
+        border-radius: 6px;
+        font-weight: 500;
+    }
+    .badge.goods { background: #e0e7ff; color: #6366f1; }
+    .badge.digital { background: #fef9c3; color: #eab308; }
+    .badge.services { background: #f3e8ff; color: var(--primary); }
+    .buyer-product-card .product-meta {
+        font-size: 1rem;
+        color: var(--primary-dark);
+        font-weight: 600;
+        margin-bottom: 8px;
+    }
+    .buyer-product-card .product-location {
+        font-size: 0.9rem;
+        color: #888;
+        font-weight: 400;
+        margin-left: 5px;
+    }
+    .buyer-product-card .product-actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 0; /* Already styled by parent actions */
+    }
+    .buyer-product-card .buy-now-btn,
+    .buyer-product-card .chat-seller-btn {
+        flex: 1;
+        padding: 8px 0;
+        font-size: 0.95rem;
+        font-weight: bold;
+        border-radius: 8px;
+        border: none;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+    .buyer-product-card .buy-now-btn:active {
+        background: var(--primary-dark);
+    }
+    .buyer-product-card .chat-seller-btn {
+        background: #e0e7ff;
+        color: #6366f1;
+        border: none;
+    }
+    .buyer-product-card .chat-seller-btn:active {
+        background: #c5d0f5;
+    }
+    /* Product Detail Modal */
+    #product-detail-modal .modal-form, #search-results-modal .modal-form {
+      max-width: 90vw;
+      width: 500px;
+      padding: 24px;
+    }
+    #product-detail-modal .product-detail-img, #search-results-modal .product-detail-img {
+      width: 100%;
+      height: 250px;
+      object-fit: contain;
+      border-radius: 12px;
+      background: var(--background);
+      margin-bottom: 15px;
+    }
+    #product-detail-modal .product-detail-title, #search-results-modal .product-detail-title {
+      font-size: 1.7rem;
+      font-weight: bold;
+      color: var(--primary-dark);
+      margin-bottom: 8px;
+    }
+    #product-detail-modal .product-detail-price, #search-results-modal .product-detail-price {
+      font-size: 1.3rem;
+      font-weight: bold;
+      color: var(--primary);
+      margin-bottom: 12px;
+    }
+    #product-detail-modal .product-detail-desc, #search-results-modal .product-detail-desc {
+      font-size: 1rem;
+      color: var(--text);
+      margin-bottom: 15px;
+      line-height: 1.5;
+    }
+    #product-detail-modal .product-detail-meta, #search-results-modal .product-detail-meta {
+      font-size: 0.95rem;
+      color: var(--muted);
+      margin-bottom: 20px;
+    }
+    #product-detail-modal .buy-now-btn, #search-results-modal .buy-now-btn {
+      width: 100%;
+      background: var(--primary);
+      color: var(--white);
+      border: none;
+      border-radius: 10px;
+      font-size: 1.15rem;
+      font-weight: bold;
+      padding: 15px 0;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    #product-detail-modal .buy-now-btn:active, #search-results-modal .buy-now-btn:active {
+      background: var(--primary-dark);
+    }
+
+    /* Top bar for sections */
+    .section-top-bar {
+      display: none; /* Hidden by default, managed by JS */
+      align-items: center;
+      justify-content: flex-start;
+      padding: 0 4vw;
+      height: 60px;
+      background: var(--white);
+      box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      max-width: 420px;
+      margin: 0 auto;
+      border-bottom-left-radius: 12px;
+      border-bottom-right-radius: 12px;
+    }
+    /* New rule to collapse space for empty titles */
+    .section-top-bar .title:empty {
+        padding: 0;
+        height: 0;
+        overflow: hidden; /* Hide overflow if any text is still there */
+        margin: 0; /* Ensure no margin is left */
+    }
+    /* Also adjust the parent bar when title is empty to remove its padding/height */
+    .section-top-bar .title:empty + .title, /* For if there were other titles */
+    .section-top-bar:has(.title:empty) {
+        padding-top: 0;
+        padding-bottom: 0;
+        height: 0;
+        min-height: 0;
+        margin-bottom: 0; /* Remove margin below the top bar */
+        box-shadow: none; /* Remove shadow if it's visually empty */
+    }
+
+    .section-top-bar .back-arrow {
+      background: none;
+      border: none;
+      font-size: 2rem;
+      color: var(--primary-dark);
+      margin-right: 15px;
+      cursor: pointer;
+      display: none; /* Hidden by default, enable if needed */
+    }
+    .section-top-bar .title {
+      font-size: 1.3rem;
+      font-weight: bold;
+      color: var(--primary-dark);
+      flex-grow: 1;
+      text-align: center;
+    }
+    body.dark-theme .section-top-bar {
+      background: #241a3a !important;
+      box-shadow: 0 1px 4px rgba(255,255,255,0.05);
+    }
+
+    /* Digital Product Type selector */
+    #digital-type-group {
+      display: none; /* Hidden by default */
+    }
+    
+    /* Quantity selector for goods */
+    .quantity-selector {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 15px;
+      margin: 20px 0;
+      padding: 10px;
+      border: 1px solid var(--muted);
+      border-radius: 8px;
+      background: var(--background);
+    }
+    .quantity-selector button {
+      background: var(--primary);
+      color: var(--white);
+      border: none;
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      font-size: 1.2rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .quantity-selector button:active {
+      background: var(--primary-dark);
+    }
+    .quantity-display {
+      font-size: 1.4rem;
+      font-weight: bold;
+      color: var(--primary-dark);
+      min-width: 30px;
+      text-align: center;
+    }
+    .current-total-price {
+        font-size: 1.2rem;
+        font-weight: bold;
+        color: var(--primary-dark);
+        text-align: center;
+        margin-top: 10px;
+    }
+
+    /* Notification modal styles */
+    .notification-list {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        padding: 10px 0;
+    }
+    .notification-item {
+        background: var(--background);
+        border-radius: 12px;
+        padding: 15px;
+        box-shadow: 0 1px 5px rgba(0,0,0,0.08);
+        border-left: 5px solid var(--primary);
+    }
+    .notification-item.unread {
+        border-left: 5px solid var(--warning);
+        font-weight: bold;
+    }
+    .notification-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 8px;
+    }
+    .notification-type {
+        font-weight: bold;
+        color: var(--primary-dark);
+    }
+    .notification-timestamp {
+        font-size: 0.85rem;
+        color: #888;
+    }
+    .notification-content {
+        font-size: 0.95rem;
+        color: var(--text);
+        margin-bottom: 10px;
+    }
+    .notification-actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 10px;
+    }
+    .notification-actions button {
+        flex: 1;
+        padding: 8px 12px;
+        border-radius: 8px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: background 0.2s;
+        border: none;
+    }
+    .notification-actions .btn-primary {
+        background: var(--primary);
+        color: var(--white);
+    }
+    .notification-actions .btn-secondary {
+        background: var(--muted);
+        color: var(--white);
+    }
+    .notification-actions .btn-success {
+        background: var(--success);
+        color: var(--white);
+    }
+    .notification-actions .btn-error {
+        background: var(--error);
+        color: var(--white);
+    }
+    /* Specific modal for Goods Chat/Quantity */
+    #goods-chat-modal .modal-form,
+    #digital-buy-modal .modal-form,
+    #service-agree-modal .modal-form {
+      padding: 24px;
+      text-align: center;
+    }
+    #goods-chat-modal .product-info-mini img,
+    #digital-buy-modal .product-info-mini img,
+    #service-agree-modal .product-info-mini img {
+        width: 100px;
+        height: 100px;
+        object-fit: contain;
+        border-radius: 10px;
+        margin-bottom: 10px;
+        background: var(--background);
+    }
+    #goods-chat-modal .product-info-mini .name,
+    #digital-buy-modal .product-info-mini .name,
+    #service-agree-modal .product-info-mini .name {
+        font-weight: bold;
+        font-size: 1.2rem;
+        color: var(--primary-dark);
+        margin-bottom: 5px;
+    }
+    #goods-chat-modal .product-info-mini .details,
+    #digital-buy-modal .product-info-mini .details,
+    #service-agree-modal .product-info-mini .details {
+        font-size: 0.95rem;
+        color: var(--text);
+        margin-bottom: 15px;
+    }
+    #goods-chat-modal .modal-footer-btns,
+    #digital-buy-modal .modal-footer-btns,
+    #service-agree-modal .modal-footer-btns {
+        margin-top: 20px;
+        display: flex;
+        gap: 10px;
+        flex-direction: column;
+    }
+    #goods-chat-modal .modal-footer-btns button,
+    #digital-buy-modal .modal-footer-btns button,
+    #service-agree-modal .modal-footer-btns button {
+        width: 100%;
+        padding: 12px;
+        border-radius: 10px;
+        font-weight: bold;
+        border: none;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+    .payment-success-message {
+      text-align: center;
+      margin-top: 20px;
+      color: var(--success);
+      font-weight: bold;
+      font-size: 1.1rem;
+    }
+    .payment-id-display {
+      background: var(--background);
+      padding: 10px 15px;
+      border-radius: 8px;
+      border: 1px dashed var(--primary);
+      margin: 15px 0;
+      font-family: monospace;
+      font-size: 0.9rem;
+      word-break: break-all;
+    }
+
+    /* Notification badge styles */
+    .notification-badge {
+        position: absolute;
+        top: 5px; /* Adjust as needed */
+        right: 5px; /* Adjust as needed */
+        background-color: var(--warning);
+        color: white;
+        border-radius: 50%;
+        padding: 3px 7px;
+        font-size: 0.75rem;
+        font-weight: bold;
+        line-height: 1;
+        display: none; /* Hidden by default */
+        transform: translate(50%, -50%);
+        z-index: 101;
+    }
+
+    /* Toast Notification styles */
+    #toast-container {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 3000;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      pointer-events: none; /* Allow clicks to pass through */
+    }
+    .toast-message {
+      background-color: var(--primary-dark);
+      color: var(--white);
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-size: 1rem;
+      text-align: center;
+      opacity: 0;
+      transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      transform: translateY(-20px);
+    }
+    .toast-message.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .toast-message.success {
+        background-color: var(--success);
+    }
+    .toast-message.error {
+        background-color: var(--error);
+    }
+    .toast-message.info {
+        background-color: var(--primary);
+    }
+    .ai-loading-spinner {
+        border: 4px solid rgba(255, 255, 255, 0.3);
+        border-top: 4px solid var(--primary-dark);
+        border-radius: 50%;
+        width: 24px;
+        height: 24px;
+        animation: spin 1s linear infinite;
+        display: inline-block;
+        vertical-align: middle;
+        margin-left: 10px;
+        display: none; /* Hidden by default */
+    }
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+    .ai-button-container {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        gap: 10px;
+        margin-top: -10px; /* Adjust to align with textarea */
+        margin-bottom: 10px;
+    }
+    .ai-button {
+        background: var(--muted);
+        color: var(--white);
+        border: none;
+        border-radius: 8px;
+        padding: 8px 12px;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: background 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+    .ai-button:active {
+        background: var(--primary);
+    }
+    .generated-headlines-container {
+        margin-top: 10px;
+        margin-bottom: 20px;
+        padding: 10px;
+        background: var(--background);
+        border: 1px dashed var(--muted);
+        border-radius: 8px;
+        font-size: 0.95rem;
+        color: var(--text);
+        display: none; /* Hidden by default */
+    }
+    .generated-headlines-container h4 {
+        margin-top: 0;
+        margin-bottom: 8px;
+        color: var(--primary-dark);
+        font-size: 1rem;
+        text-align: center;
+    }
+    .generated-headlines-container ul {
+        list-style: decimal;
+        padding-left: 20px;
+        margin: 0;
+    }
+    .generated-headlines-container li {
+        margin-bottom: 5px;
+        cursor: pointer;
+        transition: color 0.1s;
+    }
+    .generated-headlines-container li:hover {
+        color: var(--primary);
+    }
+
+    /* Search Modal Specific Styles */
+    #search-modal .search-results-content {
+        max-height: 400px; /* Limit height for scrollable content */
+        overflow-y: auto;
+        padding-top: 15px;
+        border-top: 1px solid var(--muted);
+        margin-top: 15px;
+    }
+    #search-modal .search-results-item {
+        background: var(--background);
+        border-radius: 10px;
+        padding: 10px;
+        margin-bottom: 10px;
+        border: 1px solid var(--muted);
+    }
+    #search-modal .search-results-item strong {
+        color: var(--primary-dark);
+    }
+    #search-modal .search-results-item p {
+        font-size: 0.95rem;
+        margin-bottom: 5px;
+    }
+    #search-modal .no-results {
+        text-align: center;
+        color: var(--muted);
+        padding: 20px;
+    }
+
+    /* Leaderboard styles */
+    .leaderboard-list {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin-top: 20px;
+        padding: 0 4vw; /* Consistent padding */
+    }
+    .leaderboard-item {
+        background: var(--white);
+        border-radius: 12px;
+        padding: 15px;
+        box-shadow: 0 1px 5px rgba(0,0,0,0.08);
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+    .leaderboard-item .rank {
+        font-size: 1.4rem;
+        font-weight: bold;
+        color: var(--primary-dark);
+        min-width: 30px;
+        text-align: center;
+    }
+    .leaderboard-item .avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: var(--background);
+    }
+    .leaderboard-item .info {
+        flex-grow: 1;
+    }
+    .leaderboard-item .handle {
+        font-weight: bold;
+        color: var(--text);
+        font-size: 1.1rem;
+    }
+    .leaderboard-item .points {
+        font-size: 1rem;
+        color: var(--primary);
+    }
+    .leaderboard-item .points-value {
+        font-weight: bold;
+    }
+    img{
+       border-radius: 8px;
+    }
+
+  </style>
+</head>
+<body>
+  <!-- Welcome Page Content - Initially Visible -->
+  <div class="welcome-container" id="welcome-page-container">
+      <!-- Canvas for dynamic lightning strikes -->
+      <canvas id="lightningCanvas" class="lightning-canvas"></canvas>
+
+      <!-- Animated background shapes -->
+      <div class="shape shape-small"></div>
+      <div class="shape shape-medium-1"></div>
+      <div class="shape shape-medium-2"></div>
+      <div class="shape shape-large"></div>
+
+      <div class="welcome-content">
+          <div class="logo-box">
+              <img src="IMG-20250601-WA0018.jpg" alt="KnowEmpire Logo" onerror="this.src='https://placehold.co/100x100?text=KE_Logo_Fallback'">
+          </div>
+          <h1 class="welcome-title">KnowEmpire</h1>
+          <p class="welcome-subtitle">The First P2P Marketplace Built on Farcaster</p>
+          <button class="enter-button" id="enter-marketplace-btn">Enter Marketplace</button>
+      </div>
+  </div>
+
+  <!-- Main App Content - Initially Hidden -->
+  <div id="main-app-content">
+    <!-- Top Bars for Sections - Now sticky and within main-app-content -->
+    <div class="section-top-bar" id="top-bar-post">
+      <div class="title"></div>
+    </div>
+    <div class="section-top-bar" id="top-bar-browse-products">
+      <div class="title"></div> 
+    </div>
+    <div class="section-top-bar" id="top-bar-profile">
+      <div class="title"></div>
+    </div>
+    <div class="section-top-bar" id="top-bar-leaderboard">
+      <div class="title"></div>
+    </div>
+    <div class="section-top-bar" id="top-bar-referral">
+      <div class="title"></div>
+    </div>
+    <div class="section-top-bar" id="top-bar-notifications">
+      <div class="title"></div>
+    </div>
+    <div class="section-top-bar" id="top-bar-menu">
+      <div class="title"></div>
+    </div>
+
+    <div class="container" id="landing-content">
+      <h1>The First P2P Marketplace Built on Farcaster</h1>
+      <div class="subtext">
+        Trade goods or services. Earn trustlessly. Powered by $KNOW & escrow.
+      </div>
+      <hr>
+      <div class="explainer">
+        <div>KnowEmpire connects buyers and sellers through a secure crypto-native experience.</div>
+        <div>Whether you're selling physical products, offering services, or just referring others — you earn through our trustless system.</div>
+      </div>
+      <hr>
+      <button class="cta-btn" id="waitlist-btn">Join the Waitlist</button>
+      <div id="waitlist-success" style="display:none; text-align:center; color:var(--primary-dark); font-weight:bold; margin-bottom:18px;">
+        🎉 You’ve joined the waitlist!
+      </div>
+      <div class="addon">
+        <span>Already a seller or service provider?</span>
+        <a id="open-registration">Register to Sell</a>
+        <button id="register-buyer" type="button">Register as Buyer</button>
+      </div>
+      <div class="footer">
+        $KNOW token live • Escrow powered • Built for the Farcaster community.
+      </div>
+    </div>
+
+    <div class="modal-bg" id="registration-modal">
+      <div class="form-container">
+        <button class="close-btn" id="close-registration" title="Close">&times;</button>
+        <h2>🧾 Become a Seller</h2>
+        <form id="seller-form">
+          <label for="email">Email Address</label>
+          <input class="input" type="email" id="email" name="email" placeholder="your@email.com" required>
+          <label>What do you want to sell?</label>
+          <div class="radio-group">
+            <label><input type="radio" name="category" value="goods" required> Goods</label>
+            <label><input type="radio" name="category" value="digital"> Digital</label>
+            <label><input type="radio" name="category" value="services"> Services</label>
+          </div>
+          <label for="description">Describe your offer (1–2 sentences):</label>
+          <textarea id="description" name="description" rows="3" placeholder="Describe what you offer..." required></textarea>
+          <label for="portfolio">Portfolio or Sample Link</label>
+          <input class="input" type="url" id="portfolio" name="portfolio" placeholder="https://">
+          <label for="location">Where are you based?</label>
+          <select id="location" name="location" required>
+            <option value="">Select region</option>
+            <option value="africa">Africa</option>
+            <option value="europe">Europe</option>
+            <option value="asia">Asia</option>
+            <option value="north-america">North America</option>
+            <option value="south-america">South America</option>
+            <option value="australia">Australia</option>
+            <option value="antarctica">Antarctica</option>
+          </select>
+          <div class="checkbox-row">
+            <label>
+              <input type="checkbox" name="agreement" required>
+              I agree to deliver what I promise. I understand escrow protects both buyer and seller.
+            </label>
+          </div>
+          <button class="register-btn" type="submit">Register as Seller</button>
+        </form>
+      </div>
+    </div>
+
+    <div class="modal-bg" id="buyer-modal">
+      <div class="form-container">
+        <button class="close-btn" id="close-buyer" title="Close">&times;</button>
+        <h2>🛒 Register as Buyer</h2>
+        <form id="buyer-form">
+          <label for="buyer-email">Email Address</label>
+          <input class="input" type="email" id="buyer-email" name="buyer-email" placeholder="your@email.com" required>
+          <button class="register-btn" type="submit" style="margin-top:10px;">Register as Buyer</button>
+          <div id="buyer-success" style="display:none; text-align:center; color:var(--primary-dark); font-weight:bold; margin-top:14px;">
+            🎉 You’re registered as a buyer!<br>
+            <span id="buyer-countdown"></span>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="dashboard-section" id="section-post">
+      <div class="category-tabs" id="seller-category-tabs">
+        <button class="category-tab active" data-category="goods">Goods</button>
+        <button class="category-tab" data-category="services">Services</button>
+        <button class="category-tab" data-category="digital">Digital</button>
+      </div>
+      <button class="fab" id="open-post-form" title="Add Product">
+        <span class="material-icons">add</span>
+      </button>
+      <div class="product-list-stacked" id="seller-product-list">
+        </div>
+    </div>
+
+    <div class="dashboard-section" id="section-browse-products">
+      <div class="category-tabs" id="buyer-category-tabs">
+          <button class="category-tab active" data-category="all">All</button>
+          <button class="category-tab" data-category="goods">Goods</button>
+          <button class="category-tab" data-category="services">Services</button>
+          <button class="category-tab" data-category="digital">Digital</button>
+      </div>
+      <div class="buyer-product-list" id="all-products-list">
+        </div>
+    </div>
+
+    <div class="dashboard-section" id="section-profile">
+      <div class="profile-card">
+        <div class="profile-header">
+          <div class="profile-avatar-bg">
+            <img src="https://api.dicebear.com/7.x/pixel-art/svg?seed=remarkablesam" alt="Avatar" class="profile-avatar" id="profile-avatar">
+          </div>
+          <div class="profile-username" id="profile-username">@anonymous</div>
+          <div class="profile-wallet" id="profile-wallet" style="display:none;">
+            <span class="profile-wallet-icon material-icons">account_balance_wallet</span>
+            <span class="profile-wallet-text" id="wallet-address">UQC••••DEC</span>
+            <span class="profile-wallet-action material-icons" id="disconnect-wallet" title="Disconnect">logout</span>
+          </div>
+          <button class="connect-wallet-btn" id="connect-wallet-btn">Connect Farcaster Wallet</button>
+        </div>
+        <div class="profile-tabs">
+          <button class="profile-tab active">POINTS</button>
+          <button class="profile-tab">REWARDS</button>
+        </div>
+        <div class="profile-assets-title">Virtual assets</div>
+        <div class="profile-assets-sub">Trade for VT</div>
+        <div class="profile-assets-row">
+          <div class="profile-asset-card">
+            <img src="https://api.iconify.design/ph:egg.svg?color=%23000" class="profile-asset-icon" alt="Egg">
+            <div class="profile-asset-label">Know point</div>
+            <div class="profile-asset-value" id="know-points-display">0</div>
+          </div>
+          <div class="profile-asset-card">
+            <img src="https://api.iconify.design/ph:currency-circle-dollar.svg?color=%23000" class="profile-asset-icon" alt="USD">
+            <div class="profile-asset-label">Virtual USD</div>
+            <div class="profile-asset-value">$802,325.14</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="dashboard-section" id="section-leaderboard">
+      <h2 style="text-align:center; color:var(--primary-dark); margin-bottom:20px;">Top Know Points Holders</h2>
+      <div class="leaderboard-list" id="leaderboard-list">
+        <!-- Leaderboard items will be rendered here -->
+      </div>
+    </div>
+    <div class="dashboard-section" id="section-referral">
+      <div class="referral-bg">
+        <div class="referral-header" style="margin-bottom:5px;"> <!-- Adjusted margin -->
+          <img src="https://api.iconify.design/ph:alien-bold.svg?color=%23000" alt="Invite" class="referral-icon">
+          <div class="referral-title">INVITE FRENS</div> <!-- Restored text -->
+        </div>
+        <div class="referral-balance-box">
+          <span class="referral-balance">0 VT</span>
+          <button class="referral-claim-btn" disabled>CLAIM</button>
+        </div>
+        <div class="referral-desc">Score 5% from your buddies’ earned tokens + 1.25% from their referrals.</div> <!-- Restored text -->
+        <button class="referral-invite-btn">
+          <span class="material-icons" style="font-size:1.2em;vertical-align:middle;">card_giftcard</span>
+          <span style="margin-left:8px;">INVITE A FREN</span>
+        </button>
+      </div>
+    </div>
+    <div class="dashboard-section" id="section-notifications">
+      <div class="notification-list" id="notification-list">
+        <!-- Notifications will be rendered here -->
+        <div style="text-align: center; color: var(--muted); padding: 20px;">No new notifications.</div>
+      </div>
+    </div>
+    <div class="dashboard-section" id="section-menu">
+      <div class="menu-list" style="display: flex; flex-direction: column; gap: 18px; margin-top: 18px;">
+        <button class="menu-item" id="notification-btn" data-action="notifications">
+          <span class="material-icons" style="vertical-align:middle;">notifications</span>
+          <span style="margin-left:10px;">Notifications</span>
+          <span class="notification-badge"></span>
+        </button>
+        <button class="menu-item" id="view-products-btn" data-action="view-products">
+          <span class="material-icons" style="vertical-align:middle;">storefront</span>
+          <span style="margin-left:10px;">View Products (Buyer View)</span>
+        </button>
+        <button class="menu-item" id="search-id-button" data-action="search-id">
+          <span class="material-icons" style="vertical-align:middle;">search</span>
+          <span style="margin-left:10px;">Search by ID</span>
+        </button>
+        <button class="menu-item" id="support-btn" data-action="support">
+          <span class="material-icons" style="vertical-align:middle;">support_agent</span>
+          <span style="margin-left:10px;">Support</span>
+        </button>
+        <button class="menu-item" id="logout-btn" data-action="logout">
+          <span class="material-icons" style="vertical-align:middle;">logout</span>
+          <span style="margin-left:10px;">Logout</span>
+        </button>
+        <div style="text-align:center; color:#aaa; font-size:0.95rem; margin-top:10px;">
+          App version 1.0.3
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-form-bg" id="post-form-modal">
+      <div class="modal-form">
+        <button class="close-btn" id="close-post-form" title="Close">&times;</button>
+        <form id="product-form">
+          <label for="product-image">Image</label>
+          <input type="file" id="product-image" accept="image/*" style="margin-bottom:10px;">
+          <img id="image-preview" class="image-preview" alt="Preview">
+          <label for="product-name">Product Name</label>
+          <input id="product-name" required maxlength="40" placeholder="e.g. Handmade Wallet">
+          <label for="product-desc">Description</label>
+          <textarea id="product-desc" rows="3" placeholder="Describe what you offer..." required></textarea>
+          
+          <label for="product-price">Price ($KNOW)</label>
+          <input id="product-price" type="number" min="1" required placeholder="e.g. 50">
+          <label for="product-category">Category</label>
+          <select id="product-category" required>
+            <option value="">Select category</option>
+            <option value="goods">Goods</option>
+            <option value="services">Services</option>
+            <option value="digital">Digital</option>
+          </select>
+          <!-- Digital Product Type - dynamically shown/hidden -->
+          <div id="digital-type-group" style="display: none;">
+            <label for="digital-type">Digital Product Type</label>
+            <select id="digital-type">
+              <option value="">Select type</option>
+              <option value="ebook">Ebook</option>
+              <option value="software">Software</option>
+              <option value="online-course">Online Course</option>
+              <option value="digital-art">Digital Art</option>
+              <option value="audio">Audio</option>
+              <option value="templates-themes">Templates and Themes</option>
+              <option value="photo">Photo</option>
+              <option value="video">Video</option>
+              <option value="text">Text</option>
+            </select>
+            <label for="digital-file">Digital File Upload</label>
+            <input type="file" id="digital-file" accept=".pdf,.zip,.epub,.mp3,.mp4,.jpg,.png,.txt,.doc" style="margin-bottom:10px;">
+            <div id="digital-file-name" style="font-size:0.9rem; color:var(--muted); margin-bottom:10px;"></div>
+          </div>
+
+          <label for="product-location">Location</label>
+          <input id="product-location" required maxlength="40" placeholder="e.g. New York, NY">
+          <button type="submit" class="register-btn" style="margin-top:10px;">Post Product</button>
+        </form>
+      </div>
+    </div>
+
+    <div class="modal-form-bg" id="product-detail-modal">
+      <div class="modal-form">
+        <button class="close-btn" id="close-product-detail" title="Close">&times;</button>
+        <img src="" alt="Product Image" class="product-detail-img" id="detail-product-image">
+        <div class="product-detail-title" id="detail-product-name"></div>
+        <div class="product-detail-price" id="detail-product-price"></div>
+        <div class="product-detail-desc" id="detail-product-desc"></div>
+        <div class="product-detail-meta" id="detail-product-meta"></div>
+        <button class="buy-now-btn">Buy Now</button>
+      </div>
+    </div>
+
+    <!-- Goods Chat/Quantity Modal -->
+    <div class="modal-form-bg" id="goods-chat-modal">
+      <div class="modal-form">
+        <button class="close-btn" id="close-goods-chat" title="Close">&times;</button>
+        <h2>Chat with Seller</h2>
+        <div class="product-info-mini">
+          <img id="goods-chat-img" src="" alt="Product Image">
+          <div class="name" id="goods-chat-name"></div>
+          <div class="details" id="goods-chat-details"></div>
+        </div>
+        <div class="quantity-selector">
+          <button id="qty-minus">-</button>
+          <span class="quantity-display" id="goods-qty">1</span>
+          <button id="qty-plus">+</button>
+        </div>
+        <div class="current-total-price" id="goods-total-price">$0 KNOW</div>
+        <div class="modal-footer-btns">
+          <button class="cta-btn" id="goods-chat-continue-btn">Continue</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Digital Buy Modal -->
+    <div class="modal-form-bg" id="digital-buy-modal">
+      <div class="modal-form">
+        <button class="close-btn" id="close-digital-buy" title="Close">&times;</button>
+        <h2>Digital Product</h2>
+        <div class="product-info-mini">
+          <img id="digital-buy-img" src="" alt="Product Image">
+          <div class="name" id="digital-buy-name"></div>
+          <div class="details" id="digital-buy-details"></div>
+        </div>
+        <div class="modal-footer-btns">
+          <button class="cta-btn" id="digital-buy-btn">Buy ($<span id="digital-buy-price">0</span> KNOW)</button>
+          <div class="payment-success-message" id="digital-payment-success" style="display:none;">Payment Successful!</div>
+          <div class="payment-id-display" id="digital-payment-id" style="display:none;"></div>
+          <button class="cta-btn" id="digital-download-btn" style="display:none;">Download Product</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Service Agree Modal -->
+    <div class="modal-form-bg" id="service-agree-modal">
+      <div class="modal-form">
+        <button class="close-btn" id="close-service-agree" title="Close">&times;</button>
+        <h2>Service Request</h2>
+        <div class="product-info-mini">
+          <img id="service-agree-img" src="" alt="Product Image">
+          <div class="name" id="service-agree-name"></div>
+          <div class="details" id="service-agree-details"></div>
+        </div>
+        <label for="service-date">Preferred Date</label>
+        <input class="input" type="date" id="service-date" required>
+        <label for="service-start-time">Start Time</label>
+        <input class="input" type="time" id="service-start-time" required>
+        <label for="service-end-time">End Time</label>
+        <input class="input" type="time" id="service-end-time" required>
+        <label for="service-location-input">Location for Work</label>
+        <input class="input" type="text" id="service-location-input" placeholder="e.g. Client's address, Online" required>
+        <div class="modal-footer-btns">
+          <button class="cta-btn" id="service-agree-send-btn">Agree & Send Request</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Goods Buy Now Modal -->
+    <div class="modal-form-bg" id="goods-buy-modal">
+      <div class="modal-form">
+        <button class="close-btn" id="close-goods-buy" title="Close">&times;</button>
+        <h2>Confirm Purchase</h2>
+        <div class="product-info-mini">
+          <img id="goods-buy-img" src="" alt="Product Image">
+          <div class="name" id="goods-buy-name"></div>
+          <div class="details" id="goods-buy-details"></div>
+        </div>
+        <div class="quantity-selector">
+          <button id="goods-buy-qty-minus">-</button>
+          <span class="quantity-display" id="goods-buy-qty">1</span>
+          <button id="goods-buy-qty-plus">+</button>
+        </div>
+        <div class="current-total-price" id="goods-buy-total-price">$0 KNOW</div>
+        <div class="modal-footer-btns">
+          <button class="cta-btn" id="goods-buy-confirm-btn">Proceed to Pay</button>
+          <div class="payment-success-message" id="goods-payment-success" style="display:none;">Payment Successful!</div>
+          <div class="payment-id-display" id="goods-payment-id" style="display:none;"></div>
+          <button class="cta-btn" id="print-receipt-btn" style="display:none;">Print Receipt</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Search Modal -->
+    <div class="modal-bg" id="search-modal">
+      <div class="modal-form">
+        <button class="close-btn" id="close-search-modal" title="Close">&times;</button>
+        <h2>🔎 Search by ID</h2>
+        <p style="text-align:center; color:var(--text); font-size:0.95rem; margin-bottom:15px;">Enter a Product ID or a Transaction ID (e.g., PROD-ABCDEF, PAY-12345)</p>
+        <input class="input" type="text" id="search-input" placeholder="Enter ID here..." required>
+        <button class="register-btn" id="perform-search-btn">Search</button>
+        <div id="search-results-content" class="search-results-content">
+          <!-- Search results will be displayed here -->
+        </div>
+      </div>
+    </div>
+
+
+    <div class="bottom-nav" id="bottom-nav" style="display:none;">
+    </div>
+  </div> <!-- End of #main-app-content -->
+
+  <!-- Global Toast Container -->
+  <div id="toast-container"></div>
+
+  <script>
+    // Global state management
+    let currentUserType = null; // 'buyer', 'seller', or null
+    let currentUserEmail = ''; // To store the email of the logged-in user
+    let userKnowPoints = parseInt(localStorage.getItem('userKnowPoints') || '0');
+    let lastLoginTimestamp = localStorage.getItem('lastLoginTimestamp');
+
+    // All products posted by any seller
+    let allProducts = [];
+    // Notifications for the current user (this will be loaded dynamically per user)
+    let userNotifications = []; 
+    console.log('Initial userNotifications loaded (empty array as placeholder before user is determined):', userNotifications);
+
+
+    // Pre-populate with some dummy products for buyer view
+    allProducts.push(
+        { id: generateProductId(), name: "Running Shoes", desc: "Comfortable running shoes for all terrains.", price: 120, category: "goods", location: "New York, NY", image: "https://placehold.co/150x150/EEEEEE/888888?text=Shoes", sellerHandle: "@sportyfeet", sellerEmail: "seller1@example.com" },
+        { id: generateProductId(), name: "Modern Chair", desc: "Ergonomic design for your home office.", price: 210, category: "goods", location: "San Angeles, CA", image: "https://placehold.co/150x150/EEEEEE/888888?text=Chair", sellerHandle: "@cozyhome", sellerEmail: "seller2@example.com" },
+        { id: generateProductId(), name: "Laptop Repair", desc: "Expert laptop repair services.", price: 80, category: "services", location: "San Francisco, CA", image: "https://placehold.co/150x150/EEEEEE/888888?text=Repair", sellerHandle: "@techfix", sellerEmail: "seller3@example.com" },
+        { id: generateProductId(), name: "Hoodie", desc: "Cozy and stylish hoodie for everyday wear.", price: 50, category: "goods", location: "Austin, TX", image: "https://placehold.co/150x150/EEEEEE/888888?text=Hoodie", sellerHandle: "@stylishwear", sellerEmail: "seller4@example.com" },
+        { id: generateProductId(), name: "Website Design", desc: "Custom website design for small businesses.", price: 500, category: "services", location: "Remote", image: "https://placehold.co/150x150/EEEEEE/888888?text=WebDesign", sellerHandle: "@webwizard", sellerEmail: "seller5@example.com" },
+        { id: generateProductId(), name: "E-book: Learn JS", desc: "Digital e-book to master JavaScript.", price: 25, category: "digital", digitalType: "ebook", digitalFile: "javascript-ebook.pdf", location: "Online", image: "https://placehold.co/150x150/EEEEEE/888888?text=Ebook", sellerHandle: "@codelearn", sellerEmail: "seller6@example.com" },
+        { id: generateProductId(), name: "Digital Art Pack", desc: "Collection of unique digital artworks.", price: 75, category: "digital", digitalType: "digital-art", digitalFile: "artpack.zip", location: "Online", image: "https://placehold.co/150x150/EEEEEE/888888?text=Art", sellerHandle: "@artflow", sellerEmail: "seller7@example.com" }
+    );
+
+    // --- Utility Functions ---
+    function capitalize(str) {
+      return str.charAt(0).toUpperCase() + str.slice(1);
+    }
+
+    function generateProductId() {
+        return 'PROD-' + Math.random().toString(36).substr(2, 9).toUpperCase();
+    }
+
+    function generatePaymentId() {
+        return 'PAY-' + Math.random().toString(36).substr(2, 12).toUpperCase();
+    }
+
+    function getFormattedDate(date) {
+        const options = { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+        return new Date(date).toLocaleDateString(undefined, options);
+    }
+
+    // --- Toast Notification System ---
+    const toastContainer = document.getElementById('toast-container');
+    let toastTimeout;
+
+    /**
+     * Displays a temporary toast notification.
+     * @param {string} message The message to display.
+     * @param {string} type The type of toast ('success', 'error', 'info').
+     * @param {number} duration The duration in milliseconds before the toast fades (default 3000).
+     */
+    function showToast(message, type = 'info', duration = 3000) {
+        // Clear any existing toast timeout
+        if (toastTimeout) {
+            clearTimeout(toastTimeout);
+        }
+
+        const toast = document.createElement('div');
+        toast.className = `toast-message ${type}`;
+        toast.textContent = message;
+
+        // Clear existing toasts before adding a new one, or manage multiple if desired
+        toastContainer.innerHTML = ''; // For single toast at a time
+        toastContainer.appendChild(toast);
+
+        // Animate in
+        setTimeout(() => {
+            toast.classList.add('show');
+        }, 10); // Small delay for CSS transition to apply
+
+        // Animate out and remove
+        toastTimeout = setTimeout(() => {
+            toast.classList.remove('show');
+            toast.addEventListener('transitionend', () => toast.remove(), { once: true });
+        }, duration);
+    }
+
+    // --- Know Points Logic ---
+    function updateKnowPointsDisplay() {
+        document.getElementById('know-points-display').textContent = userKnowPoints.toLocaleString();
+        localStorage.setItem('userKnowPoints', userKnowPoints.toString());
+    }
+
+    function addKnowPoints(points) {
+        userKnowPoints += points;
+        updateKnowPointsDisplay();
+    }
+
+    function checkDailyLoginPoints() {
+        const today = new Date().toDateString();
+        const lastLogin = localStorage.getItem('lastLoginDate');
+
+        if (lastLogin !== today) {
+            addKnowPoints(100);
+            localStorage.setItem('lastLoginDate', today);
+            showToast("Earned 100 Know Points for daily login!", 'info'); // Changed to 'info'
+        }
+    }
+
+    // --- Welcome Page Specific Elements and Logic ---
+    const welcomePageContainer = document.getElementById('welcome-page-container');
+    const enterMarketplaceBtn = document.getElementById('enter-marketplace-btn');
+
+    enterMarketplaceBtn.onclick = function() {
+        welcomePageContainer.classList.add('hidden'); // Hide welcome page with transition
+        // After transition, display main content and initialize main app
+        welcomePageContainer.addEventListener('transitionend', () => {
+            document.body.classList.add('main-app-active'); // Add class to body for scrolling
+            document.getElementById('main-app-content').style.display = 'block';
+            initializeMainApp(); // Call the main app initialization
+        }, { once: true });
+    };
+
+    // Canvas setup for lightning animation (moved from welcome page)
+    const lightningCanvas = document.getElementById("lightningCanvas");
+    const ctx = lightningCanvas.getContext("2d");
+
+    // Set initial canvas dimensions based on parent container
+    const setCanvasDimensions = () => {
+        lightningCanvas.width = lightningCanvas.clientWidth;
+        lightningCanvas.height = lightningCanvas.clientHeight;
+    };
+
+    // Call initially and on resize
+    setCanvasDimensions();
+    window.addEventListener("resize", setCanvasDimensions);
+
+    const LEFT = "LEFT";
+    const RIGHT = "RIGHT";
+
+    const getDir = () => {
+        const dec = Math.floor(Math.random() * 30);
+        if (dec < 16) return LEFT;
+        else return RIGHT;
+    };
+
+    class Cloud {
+        constructor(x, y) {
+            this.x = x;
+            this.y = y;
+            this.size = Math.floor(Math.random() * 30);
+            this.clr = "transparent"; // Make cloud transparent
+            this.dir = getDir();
+            this.speed = Math.floor(Math.random() * 2) + 1;
+        }
+        moveLeft() {
+            this.x -= this.speed;
+        }
+        moveRight() {
+            this.x += this.speed;
+        }
+        update() {
+            if (this.x <= 0) {
+                this.dir = RIGHT;
+            } else if (this.x >= lightningCanvas.width) {
+                this.dir = LEFT;
+            }
+
+            if (this.dir === LEFT) {
+                this.moveLeft();
+            } else {
+                this.moveRight();
+            }
+        }
+        drawRoot(x, y) {
+            let sx = x,
+                sy = y,
+                ex = sx + Math.floor(Math.random() * 50) - 15,
+                ey = sy + Math.floor(Math.random() * 30);
+            let i = 0,
+                limit = Math.floor(Math.random() * 20);
+            while (i < limit) {
+                ctx.beginPath();
+                ctx.strokeStyle = "silver";
+                ctx.lineWidth = 1;
+                ctx.moveTo(sx, sy);
+                ctx.lineTo(ex, ey);
+                ctx.stroke();
+                sx = ex;
+                sy = ey;
+                ex = sx + Math.floor(Math.random() * 30) - 15;
+                ey = sy + Math.floor(Math.random() * 30);
+                i++;
+            }
+        }
+        drawLightning() {
+            // This creates a subtle background flash across the canvas
+            ctx.fillStyle = "rgba(255, 255, 255, 0.1)";
+            ctx.fillRect(0, 0, lightningCanvas.width, lightningCanvas.height);
+
+            let sx = this.x,
+                sy = this.y,
+                ex = sx + Math.floor(Math.random() * 30) - 15,
+                ey = sy + Math.floor(Math.random() * 30);
+
+            let i = 0,
+                limit = Math.floor(Math.random() * 20) + 10;
+
+            while (i < limit) {
+                ctx.beginPath();
+                ctx.strokeStyle = "silver"; /* Color of the lightning bolt */
+                ctx.lineWidth = 3;
+                ctx.moveTo(sx, sy);
+                ctx.lineTo(ex, ey);
+                ctx.stroke();
+                sx = ex;
+                sy = ey;
+                ex = sx + Math.floor(Math.random() * 30) - 15;
+                ey = sy + Math.floor(Math.random() * 30);
+                let root = Math.floor(Math.random() * 1000);
+                if (root < 50) {
+                    this.drawRoot(sx, sy);
+                }
+                i++;
+            }
+        }
+        draw() {
+            const strike = Math.floor(Math.random() * 100000);
+
+            if (strike < 100) { /* Adjust this value for more/fewer strikes */
+                this.drawLightning();
+            }
+        }
+    }
+
+    const clouds = [];
+
+    let i = 0;
+    // Start clouds from random top positions to simulate strikes from different points
+    while (i < lightningCanvas.width) {
+        clouds.push(new Cloud(i, Math.floor(Math.random() * 50))); // Random initial Y for variety
+        i += Math.floor(Math.random() * 10) + 1;
+    }
+
+    const animateLightning = () => {
+        ctx.clearRect(0, 0, lightningCanvas.width, lightningCanvas.height); // Clear the canvas each frame
+        ctx.shadowColor = "aliceblue";
+        ctx.shadowBlur = 10;
+
+        for (let c of clouds) {
+            c.draw();
+            c.update();
+        }
+
+        requestAnimationFrame(animateLightning);
+    };
+
+    // --- Main App Modal Elements and Logic ---
+    const landingContent = document.getElementById('landing-content');
+    const bottomNav = document.getElementById('bottom-nav');
+
+    // Registration Modals
+    const openBtn = document.getElementById('open-registration');
+    const registrationModal = document.getElementById('registration-modal');
+    const closeRegistrationBtn = document.getElementById('close-registration');
+    const buyerBtn = document.getElementById('register-buyer');
+    const buyerModal = document.getElementById('buyer-modal');
+    const closeBuyerBtn = document.getElementById('close-buyer');
+    const buyerForm = document.getElementById('buyer-form');
+    const buyerSuccess = document.getElementById('buyer-success');
+    const buyerCountdown = document.getElementById('buyer-countdown');
+    const sellerForm = document.getElementById('seller-form');
+
+    // Product Posting Modal
+    const openPostFormBtn = document.getElementById('open-post-form');
+    const postFormModal = document.getElementById('post-form-modal');
+    const closePostFormBtn = document.getElementById('close-post-form');
+    const productForm = document.getElementById('product-form');
+    const imageInput = document.getElementById('product-image');
+    const imagePreview = document.getElementById('image-preview');
+    const productCategorySelect = document.getElementById('product-category');
+    const digitalTypeGroup = document.getElementById('digital-type-group');
+    const digitalFileSelect = document.getElementById('digital-file');
+    const digitalFileNameDisplay = document.getElementById('digital-file-name');
+    const productNameInput = document.getElementById('product-name'); 
+    const productDescTextarea = document.getElementById('product-desc'); 
+
+    // Product Detail Modal (for Buyer View)
+    const productDetailModal = document.getElementById('product-detail-modal');
+    const closeProductDetailBtn = document.getElementById('close-product-detail');
+    const detailProductImage = document.getElementById('detail-product-image');
+    const detailProductName = document.getElementById('detail-product-name');
+    const detailProductPrice = document.getElementById('detail-product-price');
+    const detailProductDesc = document.getElementById('detail-product-desc');
+    const detailProductMeta = document.getElementById('detail-product-meta');
+
+    // Goods Chat/Quantity Modal
+    const goodsChatModal = document.getElementById('goods-chat-modal');
+    const closeGoodsChatBtn = document.getElementById('close-goods-chat');
+    const goodsChatImg = document.getElementById('goods-chat-img');
+    const goodsChatName = document.getElementById('goods-chat-name');
+    const goodsChatDetails = document.getElementById('goods-chat-details');
+    const goodsQtyMinus = document.getElementById('qty-minus');
+    const goodsQtyDisplay = document.getElementById('goods-qty');
+    const goodsQtyPlus = document.getElementById('qty-plus');
+    const goodsTotalPriceDisplay = document.getElementById('goods-total-price');
+    const goodsChatContinueBtn = document.getElementById('goods-chat-continue-btn');
+    let currentGoodsProduct = null;
+    let currentGoodsQuantity = 1;
+
+    // Digital Buy Modal
+    const digitalBuyModal = document.getElementById('digital-buy-modal');
+    const closeDigitalBuyBtn = document.getElementById('close-digital-buy');
+    const digitalBuyImg = document.getElementById('digital-buy-img');
+    const digitalBuyName = document.getElementById('digital-buy-name');
+    const digitalBuyDetails = document.getElementById('digital-buy-details');
+    const digitalBuyPriceDisplay = document.getElementById('digital-buy-price');
+    const digitalBuyBtn = document.getElementById('digital-buy-btn');
+    const digitalPaymentSuccess = document.getElementById('digital-payment-success');
+    const digitalPaymentIdDisplay = document.getElementById('digital-payment-id');
+    const digitalDownloadBtn = document.getElementById('digital-download-btn');
+    let currentDigitalProduct = null;
+
+    // Service Agree Modal
+    const serviceAgreeModal = document.getElementById('service-agree-modal');
+    const closeServiceAgreeBtn = document.getElementById('close-service-agree');
+    const serviceAgreeImg = document.getElementById('service-agree-img');
+    const serviceAgreeName = document.getElementById('service-agree-name');
+    const serviceAgreeDetails = document.getElementById('service-agree-details');
+    const serviceDateInput = document.getElementById('service-date');
+    const serviceStartTimeInput = document.getElementById('service-start-time');
+    const serviceEndTimeInput = document.getElementById('service-end-time');
+    const serviceLocationInput = document.getElementById('service-location-input');
+    const serviceAgreeSendBtn = document.getElementById('service-agree-send-btn');
+    let currentServiceProduct = null;
+
+    // Goods Buy Now Modal
+    const goodsBuyModal = document.getElementById('goods-buy-modal');
+    const closeGoodsBuyBtn = document.getElementById('close-goods-buy');
+    const goodsBuyImg = document.getElementById('goods-buy-img');
+    const goodsBuyName = document.getElementById('goods-buy-name');
+    const goodsBuyDetails = document.getElementById('goods-buy-details');
+    const goodsBuyQtyMinus = document.getElementById('goods-buy-qty-minus');
+    const goodsBuyQtyDisplay = document.getElementById('goods-buy-qty');
+    const goodsBuyQtyPlus = document.getElementById('goods-buy-qty-plus');
+    const goodsBuyTotalPriceDisplay = document.getElementById('goods-buy-total-price');
+    const goodsBuyConfirmBtn = document.getElementById('goods-buy-confirm-btn');
+    const goodsPaymentSuccess = document.getElementById('goods-payment-success');
+    const goodsPaymentIdDisplay = document.getElementById('goods-payment-id');
+    const printReceiptBtn = document.getElementById('print-receipt-btn');
+    let currentGoodsBuyProduct = null;
+    let currentGoodsBuyQuantity = 1;
+
+    // Search Modal
+    const searchModal = document.getElementById('search-modal');
+    const closeSearchModalBtn = document.getElementById('close-search-modal');
+    const searchInput = document.getElementById('search-input');
+    const performSearchBtn = document.getElementById('perform-search-btn');
+    const searchResultsContent = document.getElementById('search-results-content');
+
+
+    // --- General Modal Open/Close Event Listeners ---
+    openBtn.onclick = () => { registrationModal.classList.add('active'); };
+    closeRegistrationBtn.onclick = () => { registrationModal.classList.remove('active'); };
+    buyerBtn.onclick = () => { buyerModal.classList.add('active'); };
+    closeBuyerBtn.onclick = () => { buyerModal.classList.remove('active'); };
+    openPostFormBtn.onclick = () => { 
+        postFormModal.classList.add('active');
+    };
+    closePostFormBtn.onclick = () => {
+      postFormModal.classList.remove('active');
+      productForm.reset();
+      imagePreview.style.display = 'none';
+      imagePreview.src = '';
+      digitalTypeGroup.style.display = 'none'; // Hide digital specific fields on close
+      document.getElementById('digital-type').value = ''; // Reset digital type dropdown
+      document.getElementById('digital-type').removeAttribute('required'); // Remove required
+      digitalFileSelect.value = '';
+      digitalFileSelect.removeAttribute('required'); // Remove required
+      digitalFileNameDisplay.textContent = '';
+    };
+    closeProductDetailBtn.onclick = () => { productDetailModal.classList.remove('active'); };
+    closeGoodsChatBtn.onclick = () => { goodsChatModal.classList.remove('active'); };
+    closeDigitalBuyBtn.onclick = () => { digitalBuyModal.classList.remove('active'); };
+    closeServiceAgreeBtn.onclick = () => { serviceAgreeModal.classList.remove('active'); };
+    closeGoodsBuyBtn.onclick = () => { goodsBuyModal.classList.remove('active'); };
+    closeSearchModalBtn.onclick = () => { searchModal.classList.remove('active'); };
+
+
+    // Close modals if clicking outside of them
+    window.onclick = (e) => {
+      if (e.target === registrationModal) registrationModal.classList.remove('active');
+      if (e.target === buyerModal) buyerModal.classList.remove('active');
+      if (e.target === postFormModal) postFormModal.classList.remove('active');
+      if (e.target === productDetailModal) productDetailModal.classList.remove('active');
+      if (e.target === goodsChatModal) goodsChatModal.classList.remove('active');
+      if (e.target === digitalBuyModal) digitalBuyModal.classList.remove('active');
+      if (e.target === serviceAgreeModal) serviceAgreeModal.classList.remove('active');
+      if (e.target === goodsBuyModal) goodsBuyModal.classList.remove('active');
+      if (e.target === searchModal) searchModal.classList.remove('active');
+    };
+
+    // --- Landing Page and Initial User Registration ---
+    const waitlistBtn = document.getElementById('waitlist-btn');
+    const waitlistSuccess = document.getElementById('waitlist-success');
+    waitlistBtn.onclick = function() {
+      waitlistBtn.style.display = 'none';
+      waitlistSuccess.style.display = 'block';
+    };
+
+    buyerForm.onsubmit = function(e) {
+      e.preventDefault();
+      currentUserEmail = document.getElementById('buyer-email').value;
+      currentUserType = 'buyer';
+      localStorage.setItem('currentUserEmail', currentUserEmail);
+      localStorage.setItem('currentUserType', currentUserType);
+      console.log('Buyer registration: currentUserEmail set to', currentUserEmail, 'currentUserType to', currentUserType);
+      loadUserNotifications(); // Load notifications for the newly set user
+      updateNotificationBadge(); // Update badge immediately
+
+      buyerForm.querySelector('button[type="submit"]').style.display = 'none';
+      buyerSuccess.style.display = 'block';
+
+      let seconds = 3;
+      buyerCountdown.textContent = `Loading main page in ${seconds}...`;
+      const interval = setInterval(() => {
+        seconds--;
+        buyerCountdown.textContent = `Loading main page in ${seconds}...`;
+        if (seconds === 0) {
+          clearInterval(interval);
+          buyerModal.classList.remove('active');
+          buyerForm.reset();
+          buyerSuccess.style.display = 'none';
+          buyerForm.querySelector('button[type="submit"]').style.display = '';
+          showDashboard();
+          checkDailyLoginPoints(); // Give points on first login/registration
+        }
+      }, 1000);
+    };
+
+    sellerForm.onsubmit = function(e) {
+      e.preventDefault();
+      currentUserEmail = document.getElementById('email').value;
+      currentUserType = 'seller';
+      localStorage.setItem('currentUserEmail', currentUserEmail);
+      localStorage.setItem('currentUserType', currentUserType);
+      console.log('Seller registration: currentUserEmail set to', currentUserEmail, 'currentUserType to', currentUserType);
+      loadUserNotifications(); // Load notifications for the newly set user
+      updateNotificationBadge(); // Update badge immediately
+
+      registrationModal.classList.remove('active');
+      landingContent.style.display = 'none';
+      showDashboard();
+      checkDailyLoginPoints(); // Give points on first login/registration
+    };
+
+    // --- Dashboard Navigation & Section Management ---
+    function showSection(sectionId) {
+      console.log(`Attempting to show section: ${sectionId}`);
+      const dashboardSections = document.querySelectorAll('.dashboard-section');
+      const topBars = document.querySelectorAll('.section-top-bar');
+      const fabButton = document.getElementById('open-post-form');
+
+      dashboardSections.forEach(sec => sec.classList.remove('active'));
+      topBars.forEach(bar => bar.style.display = 'none'); // Hide all top bars
+
+      // Ensure the element exists before trying to access its style
+      const targetTopBar = document.getElementById('top-bar-' + sectionId);
+      if (targetTopBar) {
+          targetTopBar.style.display = 'flex'; // Show relevant top bar
+          console.log(`Section '${sectionId}' is now active. Top bar '${'top-bar-' + sectionId}' is display: flex.`);
+      } else {
+          console.error(`Error: Top bar element 'top-bar-${sectionId}' not found.`);
+      }
+      
+      document.getElementById('section-' + sectionId).classList.add('active');
+
+
+      // Update active state of bottom nav buttons
+      document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+      const activeNavBtn = document.getElementById('nav-' + sectionId);
+      if (activeNavBtn) {
+        activeNavBtn.classList.add('active');
+      }
+
+      // Manage FAB visibility
+      if (currentUserType === 'seller' && sectionId === 'post') {
+        fabButton.style.display = 'flex';
+      } else {
+        fabButton.style.display = 'none';
+      }
+
+      if (sectionId === 'browse-products') {
+        const activeBuyerTab = document.querySelector('#buyer-category-tabs .category-tab.active');
+        const currentBuyerCategory = activeBuyerTab ? activeBuyerTab.dataset.category : 'all';
+        renderAllProducts(currentBuyerCategory);
+        document.getElementById('seller-category-tabs').style.display = 'none';
+        document.getElementById('buyer-category-tabs').style.display = 'flex';
+      } else if (sectionId === 'post') {
+          document.getElementById('seller-category-tabs').style.display = 'flex';
+          document.getElementById('buyer-category-tabs').style.display = 'none';
+          renderSellerProducts();
+      } else if (sectionId === 'notifications') {
+          renderNotifications();
+      } else if (sectionId === 'leaderboard') {
+          renderLeaderboard(); // Call renderLeaderboard when leaderboard section is shown
+      }
+    }
+
+    function showDashboard() {
+      console.log("showDashboard called. Current currentUserType:", currentUserType, "currentUserEmail:", currentUserEmail);
+      landingContent.style.display = 'none';
+      bottomNav.style.display = 'flex';
+      bottomNav.innerHTML = ''; // Clear existing nav buttons
+
+      const commonNavButtons = [
+        { id: 'nav-profile', icon: 'person', label: 'Profile', section: 'profile' },
+        { id: 'nav-leaderboard', icon: 'emoji_events', label: 'Leaderboard', section: 'leaderboard' },
+        { id: 'nav-referral', icon: 'share', label: 'Referral', section: 'referral' },
+        { id: 'nav-menu', icon: 'menu', label: 'Menu', section: 'menu' },
+      ];
+
+      if (currentUserType === 'seller') {
+        const postButton = createNavButton('nav-post', 'add_box', 'Post', 'post');
+        bottomNav.appendChild(postButton);
+        commonNavButtons.forEach(btnInfo => {
+          const btn = createNavButton(btnInfo.id, btnInfo.icon, btnInfo.label, btnInfo.section);
+          bottomNav.appendChild(btn);
+        });
+        showSection('post'); // Default for seller
+      } else if (currentUserType === 'buyer') {
+        const browseButton = createNavButton('nav-browse-products', 'storefront', 'Browse', 'browse-products');
+        bottomNav.appendChild(browseButton);
+        commonNavButtons.forEach(btnInfo => {
+          const btn = createNavButton(btnInfo.id, btnInfo.icon, btnInfo.label, btnInfo.section);
+          bottomNav.appendChild(btn);
+        });
+        showSection('browse-products'); // Default for buyer
+      }
+      updateKnowPointsDisplay();
+      loadUserNotifications(); // Ensure notifications are loaded when dashboard shows
+      updateNotificationBadge(); // Update badge after loading
+      removeTopBarHeadings(); // Call the updated function here
+    }
+
+    function createNavButton(id, icon, label, section) {
+      const btn = document.createElement('button');
+      btn.className = 'nav-btn';
+      btn.id = id;
+      btn.innerHTML = `<span class="material-icons">${icon}</span><span class="label">${label}</span>`;
+      btn.addEventListener('click', () => showSection(section));
+      return btn;
+    }
+
+    // --- Product Posting (Seller) ---
+    imageInput.onchange = function(e) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(evt) {
+          imagePreview.src = evt.target.result;
+          imagePreview.style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+      } else {
+        imagePreview.style.display = 'none';
+        imagePreview.src = '';
+      }
+    };
+
+    digitalFileSelect.onchange = function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            digitalFileNameDisplay.textContent = `Selected: ${file.name} (${(file.size / 1024).toFixed(2)} KB)`;
+        } else {
+            digitalFileNameDisplay.textContent = '';
+        }
+    };
+
+    productCategorySelect.onchange = function() {
+        if (this.value === 'digital') {
+            digitalTypeGroup.style.display = 'block';
+            document.getElementById('digital-type').setAttribute('required', 'required');
+            digitalFileSelect.setAttribute('required', 'required');
+        } else {
+            digitalTypeGroup.style.display = 'none';
+            document.getElementById('digital-type').removeAttribute('required');
+            digitalFileSelect.removeAttribute('required');
+            document.getElementById('digital-type').value = '';
+            digitalFileSelect.value = '';
+            digitalFileNameDisplay.textContent = '';
+        }
+    };
+
+    let sellerProducts = []; // Products specifically posted by the current seller
+    productForm.onsubmit = function(e) {
+      e.preventDefault();
+      const name = productNameInput.value.trim(); 
+      const desc = productDescTextarea.value.trim(); 
+      const price = parseFloat(document.getElementById('product-price').value);
+      const category = document.getElementById('product-category').value;
+      const location = document.getElementById('product-location').value.trim();
+      const image = imagePreview.src && imagePreview.style.display !== 'none' ? imagePreview.src : '';
+      const sellerHandle = `@${currentUserEmail.split('@')[0]}`; // Simple handle from email
+      const id = generateProductId();
+
+      let newProduct = { id, name, desc, price, image, category, location, sellerHandle, sellerEmail: currentUserEmail };
+
+      if (category === 'digital') {
+          const digitalType = document.getElementById('digital-type').value;
+          const digitalFile = digitalFileNameDisplay.textContent.split(' ')[1] || ''; // Just filename for demo
+          if (!digitalType || !digitalFile) {
+              showToast('Please select digital product type and upload a file.', 'error');
+              return;
+          }
+          newProduct = { ...newProduct, digitalType, digitalFile };
+      }
+
+      if (name && desc && price && category && location) {
+        sellerProducts.unshift(newProduct); // Add to seller's own products
+        allProducts.unshift(newProduct); // Add to global list of all products
+
+        renderSellerProducts(); // Update seller's view
+
+        productForm.reset();
+        imagePreview.style.display = 'none';
+        imagePreview.src = '';
+        digitalTypeGroup.style.display = 'none';
+        document.getElementById('digital-type').value = ''; // Reset digital type dropdown
+        document.getElementById('digital-type').removeAttribute('required'); // Remove required
+        digitalFileSelect.value = '';
+        digitalFileSelect.removeAttribute('required'); // Remove required
+        digitalFileNameDisplay.textContent = '';
+        postFormModal.classList.remove('active');
+        showToast('Product posted successfully!', 'info'); 
+      }
+    };
+
+
+    const sellerCategoryTabs = document.querySelectorAll('#seller-category-tabs .category-tab');
+    let currentSellerCategory = 'goods';
+    sellerCategoryTabs.forEach(tab => {
+      tab.onclick = function() {
+        sellerCategoryTabs.forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        currentSellerCategory = tab.getAttribute('data-category');
+        renderSellerProducts();
+      };
+    });
+
+    function renderSellerProducts() {
+      const list = document.getElementById('seller-product-list');
+      list.innerHTML = '';
+      // Filter products only by the current user's email AND category
+      const filteredSellerProducts = allProducts.filter(p => p.sellerEmail === currentUserEmail && p.category === currentSellerCategory);
+
+
+      if (filteredSellerProducts.length === 0) {
+          list.innerHTML = '<div style="text-align: center; color: var(--muted); padding: 20px;">No products posted in this category.</div>';
+          return;
+      }
+
+      filteredSellerProducts.forEach((p, i) => {
+          const card = document.createElement('div');
+          card.className = 'product-card-stacked';
+          card.innerHTML = `
+            <img src="${p.image || 'https://placehold.co/80x80/EEEEEE/888888?text=No+Image'}" alt="Product Image">
+            <div class="product-card-info">
+              <div class="product-title">${p.name}</div>
+              <div class="product-badges">
+                <span class="badge ${p.category}">${capitalize(p.category)}</span>
+                ${p.digitalType ? `<span class="badge digital">${capitalize(p.digitalType.replace('-', ' '))}</span>` : ''}
+              </div>
+              <div class="product-meta">$${p.price} <span class="product-location">${p.location}</span></div>
+              <div class="product-actions">
+                <button class="edit-btn" data-index="${i}">Edit</button>
+                <button class="delete-btn" data-index="${i}">Delete</button>
+              </div>
+            </div>
+          `;
+          card.querySelector('.edit-btn').onclick = (e) => {
+            e.stopPropagation();
+            // In a real app, this would pre-fill the post form for editing
+            showToast('Edit feature coming soon!', 'info');
+          };
+          card.querySelector('.delete-btn').onclick = (e) => {
+            e.stopPropagation();
+            const productToDelete = filteredSellerProducts[i]; // Get product from the filtered list
+
+            // Remove from allProducts (this is the source of truth)
+            allProducts = allProducts.filter(prod => prod.id !== productToDelete.id);
+
+            renderSellerProducts(); // Re-render seller's view
+            renderAllProducts(currentBuyerCategory); // Re-render buyer's view
+            showToast('Product deleted successfully!', 'info'); 
+          };
+          list.appendChild(card);
+      });
+    }
+
+    // --- Browse Products (Buyer) ---
+    const buyerCategoryTabs = document.querySelectorAll('#buyer-category-tabs .category-tab');
+    let currentBuyerCategory = 'all';
+    buyerCategoryTabs.forEach(tab => {
+      tab.onclick = function() {
+        buyerCategoryTabs.forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        currentBuyerCategory = tab.getAttribute('data-category');
+        renderAllProducts(currentBuyerCategory);
+      };
+    });
+
+    const allProductsList = document.getElementById('all-products-list');
+    function renderAllProducts(categoryFilter = 'all') {
+        allProductsList.innerHTML = '';
+
+        let productsToRender = allProducts;
+        if (categoryFilter !== 'all') {
+            productsToRender = allProducts.filter(p => p.category === categoryFilter);
+        }
+
+        if (productsToRender.length === 0) {
+            allProductsList.innerHTML = '<div style="text-align: center; color: var(--muted); padding: 20px;">No products available in this category yet.</div>';
+            return;
+        }
+
+        productsToRender.forEach((p) => {
+            const card = document.createElement('div');
+            card.className = 'buyer-product-card';
+            card.innerHTML = `
+                <img src="${p.image || 'https://placehold.co/80x80/EEEEEE/888888?text=No+Image'}" alt="${p.name}">
+                <div class="buyer-product-card-content">
+                    <div class="product-title">${p.name}</div>
+                    <div class="product-badges">
+                      <span class="badge ${p.category}">${capitalize(p.category)}</span>
+                      ${p.digitalType ? `<span class="badge digital">${capitalize(p.digitalType.replace('-', ' '))}</span>` : ''}
+                    </div>
+                    <div class="product-meta">$${p.price} <span class="product-location">${p.location}</span></div>
+                    <div class="product-actions">
+                        <button class="buy-now-btn">Buy Now</button>
+                        <button class="chat-seller-btn">Chat Seller</button>
+                    </div>
+                </div>
+            `;
+            // Add click listener to the entire card to open product detail modal
+            card.addEventListener('click', () => showProductDetail(p));
+
+            card.querySelector('.buy-now-btn').onclick = (e) => {
+                e.stopPropagation();
+                if (p.category === 'goods') {
+                    showGoodsBuyNowModal(p);
+                } else if (p.category === 'digital') {
+                    showDigitalBuyModal(p);
+                } else if (p.category === 'services') {
+                    // Services don't have a direct "buy now" from product list
+                    // They go through chat first to agree on terms.
+                    showToast('Please use "Chat Seller" for service agreements.', 'info');
+                }
+            };
+            card.querySelector('.chat-seller-btn').onclick = (e) => {
+                e.stopPropagation();
+                if (p.category === 'goods') {
+                    showGoodsChatModal(p);
+                } else if (p.category === 'digital') {
+                    // For digital, chat opens the buy modal as it's typically a direct purchase.
+                    showDigitalBuyModal(p); 
+                } else if (p.category === 'services') {
+                    showServiceAgreeModal(p);
+                }
+            };
+            allProductsList.appendChild(card);
+        });
+    }
+
+    function showProductDetail(product) {
+        detailProductImage.src = product.image || 'https://placehold.co/250';
+        detailProductName.textContent = product.name;
+        detailProductPrice.textContent = `$${product.price} KNOW`;
+        detailProductDesc.textContent = product.desc;
+        detailProductMeta.innerHTML = `Category: <span class="badge ${product.category}">${capitalize(product.category)}</span> | Location: ${product.location} | Seller: ${product.sellerHandle}`;
+        productDetailModal.classList.add('active');
+    }
+
+    // --- Specific Modals for Buyer-Seller Interaction ---
+
+    // Goods Chat Modal (Buyer Initiates)
+    function showGoodsChatModal(product) {
+        currentGoodsProduct = product;
+        currentGoodsQuantity = 1; // Reset quantity
+        goodsChatImg.src = product.image || 'https://placehold.co/100x100/EEEEEE/888888?text=No+Image';
+        goodsChatName.textContent = product.name;
+        goodsChatDetails.innerHTML = `Price: $${product.price} KNOW | Location: ${product.location} | Seller: ${product.sellerHandle} | Product ID: ${product.id}`;
+        goodsQtyDisplay.textContent = currentGoodsQuantity;
+        goodsTotalPriceDisplay.textContent = `$${(currentGoodsProduct.price * currentGoodsQuantity).toFixed(2)} KNOW`;
+        goodsChatModal.classList.add('active');
+    }
+
+    goodsQtyMinus.onclick = () => {
+        if (currentGoodsQuantity > 1) {
+            currentGoodsQuantity--;
+            goodsQtyDisplay.textContent = currentGoodsQuantity;
+            goodsTotalPriceDisplay.textContent = `$${(currentGoodsProduct.price * currentGoodsQuantity).toFixed(2)} KNOW`;
+        }
+    };
+    goodsQtyPlus.onclick = () => {
+        if (currentGoodsQuantity < 10) { // Max 10 items
+            currentGoodsQuantity++;
+            goodsQtyDisplay.textContent = currentGoodsQuantity;
+            goodsTotalPriceDisplay.textContent = `$${(currentGoodsProduct.price * currentGoodsQuantity).toFixed(2)} KNOW`;
+        }
+    };
+    goodsChatContinueBtn.onclick = () => {
+        // This notifies the seller about the incoming customer (order inquiry)
+        const notification = {
+            id: Date.now(),
+            type: 'Goods Order Inquiry',
+            productId: currentGoodsProduct.id,
+            productName: currentGoodsProduct.name,
+            quantity: currentGoodsQuantity,
+            buyerEmail: currentUserEmail,
+            buyerLocation: 'Unknown (for demo)', // In a real app, get buyer's location
+            timestamp: new Date().toISOString(),
+            status: 'pending', // Pending seller's confirmation
+            sellerEmail: currentGoodsProduct.sellerEmail, // Targeted notification
+            isRead: false
+        };
+        sendNotification(currentGoodsProduct.sellerEmail, notification);
+        goodsChatModal.classList.remove('active');
+        showToast(`Your inquiry for ${currentGoodsQuantity} x ${currentGoodsProduct.name} sent to seller ${currentGoodsProduct.sellerHandle}. Check notifications for response.`, 'info'); 
+    };
+
+    // Digital Chat/Buy Modal (Buyer Initiates)
+    // For digital products, the "Chat Seller" button directly opens the "Buy" modal.
+    function showDigitalChatModal(product) {
+        currentDigitalProduct = product;
+        digitalBuyImg.src = product.image || 'https://placehold.co/100x100/EEEEEE/888888?text=No+Image';
+        digitalBuyName.textContent = product.name;
+        digitalBuyDetails.innerHTML = `Price: $${product.price} KNOW | Type: ${capitalize(product.digitalType.replace('-', ' '))} | Seller: ${product.sellerHandle} | Product ID: ${product.id}`;
+        digitalBuyPriceDisplay.textContent = product.price;
+
+        // Reset state for new interaction
+        digitalPaymentSuccess.style.display = 'none';
+        digitalPaymentIdDisplay.style.display = 'none';
+        digitalPaymentIdDisplay.textContent = '';
+        digitalDownloadBtn.style.display = 'none';
+        digitalBuyBtn.style.display = 'block'; // Show buy button initially
+        digitalBuyModal.classList.add('active');
+    }
+
+    // Digital Buy Now from product list, also uses the same modal
+    function showDigitalBuyModal(product) {
+        showDigitalChatModal(product); // Reuses the chat modal logic
+    }
+
+    digitalBuyBtn.onclick = () => {
+        // Simulate payment
+        const paymentId = generatePaymentId();
+        digitalPaymentSuccess.style.display = 'block';
+        digitalPaymentIdDisplay.textContent = `Payment ID: ${paymentId}`;
+        digitalPaymentIdDisplay.style.display = 'block';
+        digitalBuyBtn.style.display = 'none'; // Hide buy button after payment
+        digitalDownloadBtn.style.display = 'block'; // Show download button
+
+        addKnowPoints(200); // Add 200 Know Points for successful payment
+
+        // Notify seller about successful digital product payment
+        const sellerNotification = {
+            id: Date.now(),
+            type: 'Digital Product Purchased',
+            productId: currentDigitalProduct.id,
+            productName: currentDigitalProduct.name,
+            buyerEmail: currentUserEmail,
+            paymentId: paymentId,
+            timestamp: new Date().toISOString(),
+            sellerEmail: currentDigitalProduct.sellerEmail,
+            isRead: false
+        };
+        sendNotification(currentDigitalProduct.sellerEmail, sellerNotification);
+
+        // Notify BUYER about their purchase
+        const buyerNotification = {
+            id: Date.now() + 1, // Ensure unique ID
+            type: 'Digital Product Purchased',
+            productName: currentDigitalProduct.name,
+            price: currentDigitalProduct.price,
+            paymentId: paymentId,
+            sellerHandle: currentDigitalProduct.sellerHandle,
+            timestamp: new Date().toISOString(),
+            isRead: false
+        };
+        sendNotification(currentUserEmail, buyerNotification); // Send to current user (the buyer)
+
+
+        showToast('Payment successful! You can now download your digital product.', 'info'); 
+    };
+
+    digitalDownloadBtn.onclick = () => {
+        // Simulate download
+        showToast(`Downloading ${currentDigitalProduct.name} (${currentDigitalProduct.digitalFile || 'file'})...`, 'info');
+        // In a real app, this would trigger a file download from server
+    };
+
+    // Service Agree Modal (Buyer Initiates)
+    function showServiceAgreeModal(product) {
+        currentServiceProduct = product;
+        serviceAgreeImg.src = product.image || 'https://placehold.co/100x100/EEEEEE/888888?text=No+Image';
+        serviceAgreeName.textContent = product.name;
+        serviceAgreeDetails.innerHTML = `Price: $${product.price} KNOW | Location: ${product.location} | Seller: ${product.sellerHandle} | Product ID: ${product.id}`;
+        serviceAgreeModal.classList.add('active');
+
+        // Set default date to today
+        const today = new Date();
+        const yyyy = today.getFullYear();
+        const mm = String(today.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
+        const dd = String(today.getDate()).padStart(2, '0');
+        serviceDateInput.value = `${yyyy}-${mm}-${dd}`;
+    }
+
+    serviceAgreeSendBtn.onclick = () => {
+        const serviceDate = serviceDateInput.value;
+        const startTime = serviceStartTimeInput.value;
+        const endTime = serviceEndTimeInput.value;
+        const workLocation = serviceLocationInput.value.trim();
+
+        if (!serviceDate || !startTime || !endTime || !workLocation) {
+            showToast('Please fill in all service details.', 'error');
+            return;
+        }
+
+        const notification = {
+            id: Date.now(),
+            type: 'Service Request',
+            productId: currentServiceProduct.id,
+            productName: currentServiceProduct.name,
+            serviceDate,
+            startTime,
+            endTime,
+            workLocation,
+            buyerEmail: currentUserEmail,
+            timestamp: new Date().toISOString(),
+            status: 'pending', // Pending seller's agreement
+            sellerEmail: currentServiceProduct.sellerEmail,
+            isRead: false
+        };
+        sendNotification(currentServiceProduct.sellerEmail, notification);
+        serviceAgreeModal.classList.remove('active');
+        showToast(`Your service request for ${currentServiceProduct.name} sent to seller ${currentServiceProduct.sellerHandle}.`, 'info'); 
+    };
+
+    // Goods Buy Now Modal (Buyer Confirms Payment)
+    function showGoodsBuyNowModal(product) {
+        currentGoodsBuyProduct = product;
+        currentGoodsBuyQuantity = 1; // Reset quantity for buy modal
+        goodsBuyImg.src = product.image || 'https://placehold.co/100x100/EEEEEE/888888?text=No+Image';
+        goodsBuyName.textContent = product.name;
+        goodsBuyDetails.innerHTML = `Price: $${product.price} KNOW | Location: ${product.location} | Seller: ${product.sellerHandle} | Product ID: ${product.id}`;
+        goodsBuyQtyDisplay.textContent = currentGoodsBuyQuantity;
+        goodsBuyTotalPriceDisplay.textContent = `$${(currentGoodsBuyProduct.price * currentGoodsBuyQuantity).toFixed(2)} KNOW`;
+
+        // Reset state for new interaction
+        goodsPaymentSuccess.style.display = 'none';
+        goodsPaymentIdDisplay.style.display = 'none';
+        goodsPaymentIdDisplay.textContent = '';
+        printReceiptBtn.style.display = 'none';
+        goodsBuyConfirmBtn.style.display = 'block';
+
+        goodsBuyModal.classList.add('active');
+    }
+
+    goodsBuyQtyMinus.onclick = () => {
+        if (currentGoodsBuyQuantity > 1) {
+            currentGoodsBuyQuantity--;
+            goodsBuyQtyDisplay.textContent = currentGoodsBuyQuantity;
+            goodsBuyTotalPriceDisplay.textContent = `$${(currentGoodsBuyProduct.price * currentGoodsBuyQuantity).toFixed(2)} KNOW`;
+        }
+    };
+    goodsBuyQtyPlus.onclick = () => {
+        if (currentGoodsBuyQuantity < 10) { // Max 10 items
+            currentGoodsBuyQuantity++;
+            goodsBuyQtyDisplay.textContent = currentGoodsBuyQuantity;
+            goodsBuyTotalPriceDisplay.textContent = `$${(currentGoodsBuyProduct.price * currentGoodsBuyQuantity).toFixed(2)} KNOW`;
+        }
+    };
+
+    goodsBuyConfirmBtn.onclick = () => {
+        // Simulate payment
+        const paymentId = generatePaymentId();
+        goodsPaymentSuccess.style.display = 'block';
+        goodsPaymentIdDisplay.textContent = `Payment ID: ${paymentId}`;
+        goodsPaymentIdDisplay.style.display = 'block';
+        printReceiptBtn.style.display = 'block';
+        goodsBuyConfirmBtn.style.display = 'none'; // Hide pay button after payment
+
+        addKnowPoints(200); // Add 200 Know Points for successful payment
+
+        // Notify seller about successful goods payment
+        const sellerNotification = {
+            id: Date.now(),
+            type: 'Goods Purchased',
+            productId: currentGoodsBuyProduct.id,
+            productName: currentGoodsBuyProduct.name,
+            quantity: currentGoodsBuyQuantity,
+            buyerEmail: currentUserEmail,
+            paymentId: paymentId,
+            timestamp: new Date().toISOString(),
+            sellerEmail: currentGoodsBuyProduct.sellerEmail,
+            isRead: false
+        };
+        sendNotification(currentGoodsBuyProduct.sellerEmail, sellerNotification);
+
+        // Notify BUYER about their purchase
+        const buyerNotification = {
+            id: Date.now() + 1, // Ensure unique ID
+            type: 'Goods Purchased',
+            productName: currentGoodsBuyProduct.name,
+            quantity: currentGoodsBuyQuantity,
+            price: currentGoodsBuyProduct.price,
+            paymentId: paymentId,
+            sellerHandle: currentGoodsBuyProduct.sellerHandle,
+            timestamp: new Date().toISOString(),
+            isRead: false
+        };
+        sendNotification(currentUserEmail, buyerNotification); // Send to current user (the buyer)
+
+
+        showToast('Payment successful!', 'info'); 
+    };
+
+    printReceiptBtn.onclick = () => {
+        // Simulate copying receipt details to seller notification
+        const receiptDetails = `
+            Transaction Receipt:
+            Product: ${currentGoodsBuyProduct.name}
+            Quantity: ${currentGoodsBuyQuantity}
+            Total Price: $${(currentGoodsBuyProduct.price * currentGoodsBuyQuantity).toFixed(2)} KNOW
+            Payment ID: ${goodsPaymentIdDisplay.textContent.replace('Payment ID: ', '')}
+            Buyer: ${currentUserEmail}
+            Timestamp: ${new Date().toLocaleString()}
+        `;
+        const notification = {
+            id: Date.now(),
+            type: 'Receipt Confirmation',
+            content: receiptDetails,
+            productId: currentGoodsBuyProduct.id,
+            buyerEmail: currentUserEmail,
+            sellerEmail: currentGoodsBuyProduct.sellerEmail,
+            timestamp: new Date().toISOString(),
+            isRead: false
+        };
+        sendNotification(currentGoodsBuyProduct.sellerEmail, notification);
+        showToast('Receipt details sent to seller as a notification!', 'info');
+    };
+
+    // --- Notification System ---
+    /**
+     * Loads notifications for the current user from localStorage into the global userNotifications array.
+     */
+    function loadUserNotifications() {
+        if (currentUserEmail) {
+            const notificationsKey = `notifications_${currentUserEmail}`;
+            const storedNotifications = localStorage.getItem(notificationsKey);
+            try {
+                userNotifications = storedNotifications ? JSON.parse(storedNotifications) : [];
+                console.log(`Loaded notifications for ${currentUserEmail}:`, userNotifications);
+            } catch (e) {
+                console.error(`Error parsing notifications for ${currentUserEmail}:`, e);
+                userNotifications = [];
+            }
+        } else {
+            userNotifications = [];
+            console.log('No current user email, userNotifications reset to empty.');
+        }
+    }
+
+    /**
+     * Sends a notification to a specific target email and updates their localStorage.
+     * @param {string} targetEmail The email address of the recipient.
+     * @param {object} notificationData The notification object to send.
+     */
+    function sendNotification(targetEmail, notificationData) {
+        console.log('sendNotification called. targetEmail:', targetEmail, 'currentUserEmail:', currentUserEmail, 'notificationData:', notificationData);
+
+        const notificationsKey = `notifications_${targetEmail}`;
+        let targetUserNotifications = [];
+
+        // Retrieve existing notifications for the target user
+        const storedNotifications = localStorage.getItem(notificationsKey);
+        if (storedNotifications) {
+            try {
+                targetUserNotifications = JSON.parse(storedNotifications);
+            } catch (e) {
+                console.error(`Error parsing existing notifications for ${targetEmail}:`, e);
+                // Continue with empty array if parsing fails
+            }
+        }
+        
+        // Add the new notification to the target user's array (newest first)
+        targetUserNotifications.unshift(notificationData);
+        localStorage.setItem(notificationsKey, JSON.stringify(targetUserNotifications));
+        
+        console.log(`Notification sent to ${targetEmail}. New localStorage content for ${notificationsKey}:`, localStorage.getItem(notificationsKey));
+
+        // If the notification is for the currently logged-in user, update the in-memory array and badge
+        if (targetEmail === currentUserEmail) {
+            userNotifications = targetUserNotifications; 
+            
+            // Only re-render notifications if the notifications section is currently active
+            if (document.getElementById('section-notifications').classList.contains('active')) {
+                renderNotifications();
+            }
+            updateNotificationBadge(); 
+        }
+    }
+
+    function renderNotifications() {
+        const notificationList = document.getElementById('notification-list');
+        console.log('renderNotifications called. Current userNotifications length:', userNotifications.length, 'Content:', JSON.stringify(userNotifications));
+
+        notificationList.innerHTML = ''; // Clear existing notifications
+
+        if (userNotifications.length === 0) {
+            notificationList.innerHTML = '<div style="text-align: center; color: var(--muted); padding: 20px;">No new notifications.</div>';
+            console.log('No notifications to render, list is empty.');
+            return;
+        }
+
+        userNotifications.forEach((notification, index) => {
+            const item = document.createElement('div');
+            item.className = `notification-item ${notification.isRead ? '' : 'unread'}`;
+
+            let contentHTML = '';
+            let actionButtons = '';
+            let notificationTitle = notification.type;
+
+            if (notification.type === 'Goods Order Inquiry') {
+                notificationTitle = `New Order Inquiry for ${notification.productName}`;
+                contentHTML = `Buyer: ${notification.buyerEmail} wants to buy ${notification.quantity} x ${notification.productName}. Product ID: ${notification.productId}. Buyer Location: ${notification.buyerLocation}.`;
+                actionButtons = `
+                    <button class="btn-primary" data-index="${index}" data-action="proceed-goods-inquiry">Proceed</button>
+                    <button class="btn-error" data-index="${index}" data-action="decline-goods-inquiry">Decline</button>
+                `;
+            } else if (notification.type === 'Digital Product Purchased') {
+                if (notification.buyerEmail === currentUserEmail) { 
+                    notificationTitle = `Your Purchase: ${notification.productName}`;
+                    contentHTML = `You purchased ${notification.productName} for $${notification.price} KNOW. Payment ID: ${notification.paymentId}. Seller: ${notification.sellerHandle}.`;
+                } else { 
+                    notificationTitle = `Digital Product Sold: ${notification.productName}`;
+                    contentHTML = `Buyer: ${notification.buyerEmail} purchased ${notification.productName}. Payment ID: ${notification.paymentId}.`;
+                }
+            } else if (notification.type === 'Service Request') {
+                notificationTitle = `New Service Request for ${notification.productName}`;
+                contentHTML = `Buyer: ${notification.buyerEmail} requested service on ${notification.serviceDate} from ${notification.startTime} to ${notification.endTime} at ${notification.workLocation}. Product ID: ${notification.productId}.`;
+                actionButtons = `
+                    <button class="btn-primary" data-index="${index}" data-action="agree-service">Agreed</button>
+                    <button class="btn-error" data-index="${index}" data-action="decline-service">Decline</button>
+                `;
+            } else if (notification.type === 'Goods Purchased') {
+                if (notification.buyerEmail === currentUserEmail) { 
+                    notificationTitle = `Your Purchase: ${notification.productName}`;
+                    contentHTML = `You purchased ${notification.quantity || ''} x ${notification.productName} for $${(notification.price * (notification.quantity || 1)).toFixed(2)} KNOW. Payment ID: ${notification.paymentId}. Seller: ${notification.sellerHandle}.`;
+                } else { 
+                    notificationTitle = `Goods Sold: ${notification.productName}`;
+                    contentHTML = `Buyer: ${notification.buyerEmail} purchased ${notification.quantity} x ${notification.productName}. Payment ID: ${notification.paymentId}.`;
+                }
+            } else if (notification.type === 'Receipt Confirmation') {
+                notificationTitle = `Receipt for ${notification.productName}`;
+                contentHTML = `<pre style="white-space: pre-wrap; font-family: inherit; margin: 0; color: inherit;">${notification.content}</pre>`;
+            } else if (notification.type === 'Goods Availability Confirmed') {
+                notificationTitle = `Goods Available: ${notification.productName}`;
+                contentHTML = `Seller ${notification.sellerEmail.split('@')[0]} confirmed availability for your order of ${notification.quantity} x ${notification.productName}. You can now proceed to payment!`;
+                actionButtons = `
+                    <button class="btn-primary" data-index="${index}" data-action="go-to-buy-goods">Go to Buy</button>
+                `;
+            } else if (notification.type === 'Service Agreed') {
+                notificationTitle = `Service Request Approved: ${notification.productName}`;
+                contentHTML = `Seller ${notification.sellerEmail.split('@')[0]} approved your service request for ${notification.productName} on ${notification.serviceDate} at ${notification.startTime}.`;
+            }
+
+            item.innerHTML = `
+                <div class="notification-header">
+                    <div class="notification-type">${notificationTitle}</div>
+                    <div class="notification-timestamp">${getFormattedDate(notification.timestamp)}</div>
+                </div>
+                <div class="notification-content">${contentHTML}</div>
+                <div class="notification-actions">${actionButtons}</div>
+            `;
+
+            // Mark as read when clicked or when actions are taken
+            item.addEventListener('click', () => {
+                if (!notification.isRead) {
+                    notification.isRead = true;
+                    userNotifications[index].isRead = true;
+                    localStorage.setItem(`notifications_${currentUserEmail}`, JSON.stringify(userNotifications));
+                    item.classList.remove('unread');
+                    updateNotificationBadge(); 
+                    console.log('Notification marked as read:', notification.id);
+                }
+            });
+
+            // Add event listeners for action buttons within the notification
+            if (actionButtons) {
+                const proceedButton = item.querySelector('[data-action="proceed-goods-inquiry"]');
+                if (proceedButton) {
+                    proceedButton.onclick = (e) => {
+                        e.stopPropagation();
+                        const originalNotif = userNotifications[index];
+                        const buyerNotification = {
+                            id: Date.now(),
+                            type: 'Goods Availability Confirmed',
+                            productId: originalNotif.productId,
+                            productName: originalNotif.productName,
+                            quantity: originalNotif.quantity,
+                            sellerEmail: currentUserEmail,
+                            timestamp: new Date().toISOString(),
+                            isRead: false
+                        };
+                        sendNotification(originalNotif.buyerEmail, buyerNotification);
+                        originalNotif.status = 'accepted';
+                        originalNotif.isRead = true; 
+                        localStorage.setItem(`notifications_${currentUserEmail}`, JSON.stringify(userNotifications)); 
+                        renderNotifications();
+                        updateNotificationBadge(); 
+                        showToast(`Notified buyer ${originalNotif.buyerEmail} that goods are available.`, 'info'); 
+                    };
+                }
+
+                const declineButton = item.querySelector('[data-action="decline-goods-inquiry"]');
+                if (declineButton) {
+                    declineButton.onclick = (e) => {
+                        e.stopPropagation();
+                        userNotifications.splice(index, 1); 
+                        localStorage.setItem(`notifications_${currentUserEmail}`, JSON.stringify(userNotifications)); 
+                        renderNotifications();
+                        updateNotificationBadge(); 
+                        showToast('Inquiry declined.', 'info');
+                    };
+                }
+
+                const agreeServiceButton = item.querySelector('[data-action="agree-service"]');
+                if (agreeServiceButton) {
+                    agreeServiceButton.onclick = (e) => {
+                        e.stopPropagation();
+                        const originalNotif = userNotifications[index];
+                        const buyerNotification = {
+                            id: Date.now(),
+                            type: 'Service Agreed',
+                            productId: originalNotif.productId,
+                            productName: originalNotif.productName,
+                            serviceDate: originalNotif.serviceDate,
+                            startTime: originalNotif.startTime,
+                            sellerEmail: currentUserEmail,
+                            timestamp: new Date().toISOString(),
+                            isRead: false
+                        };
+                        sendNotification(originalNotif.buyerEmail, buyerNotification);
+                        originalNotif.status = 'agreed';
+                        originalNotif.isRead = true;
+                        localStorage.setItem(`notifications_${currentUserEmail}`, JSON.stringify(userNotifications));
+                        renderNotifications();
+                        updateNotificationBadge(); 
+                        showToast(`Notified buyer ${originalNotif.buyerEmail} about service agreement.`, 'info'); 
+                    };
+                }
+
+                const declineServiceButton = item.querySelector('[data-action="decline-service"]');
+                if (declineServiceButton) {
+                    declineServiceButton.onclick = (e) => {
+                        e.stopPropagation();
+                        userNotifications.splice(index, 1); 
+                        localStorage.setItem(`notifications_${currentUserEmail}`, JSON.stringify(userNotifications));
+                        renderNotifications();
+                        updateNotificationBadge(); 
+                        showToast('Service request declined.', 'info');
+                    };
+                }
+
+                const goToBuyGoodsButton = item.querySelector('[data-action="go-to-buy-goods"]');
+                if (goToBuyGoodsButton) {
+                    goToBuyGoodsButton.onclick = (e) => {
+                        e.stopPropagation();
+                        const originalNotif = userNotifications[index];
+                        const product = allProducts.find(p => p.id === originalNotif.productId);
+                        if (product) {
+                            showGoodsBuyNowModal(product); 
+                        } else {
+                            showToast('Product not found.', 'error');
+                        }
+                        userNotifications[index].isRead = true; 
+                        localStorage.setItem(`notifications_${currentUserEmail}`, JSON.stringify(userNotifications));
+                        renderNotifications(); 
+                    };
+                }
+            }
+            notificationList.appendChild(item);
+            console.log('Appending notification item:', notification.id, notification.type);
+        });
+        updateNotificationBadge(); 
+    }
+
+    // Function to update the notification badge
+    function updateNotificationBadge() {
+        const notificationsBtn = document.getElementById('nav-menu'); // Use the 'menu' nav button as the parent for the badge
+        if (!notificationsBtn) {
+            console.log("Notifications button not found, cannot update badge.");
+            return; 
+        }
+
+        const unreadCount = userNotifications.filter(notif => !notif.isRead).length;
+        let badge = notificationsBtn.querySelector('.notification-badge');
+
+        if (unreadCount > 0) {
+            if (!badge) {
+                badge = document.createElement('span');
+                badge.className = 'notification-badge';
+                notificationsBtn.appendChild(badge);
+            }
+            badge.textContent = unreadCount > 9 ? '9+' : unreadCount; 
+            badge.style.display = 'block';
+            console.log(`Notification badge updated: ${unreadCount} unread for ${currentUserEmail}.`);
+        } else {
+            if (badge) {
+                badge.style.display = 'none';
+                console.log(`Notification badge hidden: No unread notifications for ${currentUserEmail}.`);
+            }
+        }
+    }
+
+    /**
+     * Removes specified labels/headings from the UI and adjusts spacing.
+     */
+    function removeTopBarHeadings() {
+        // Remove text content from top bar titles
+        const topBarTitles = [
+            'top-bar-browse-products',
+            'top-bar-profile',
+            'top-bar-leaderboard',
+            'top-bar-referral',
+            'top-bar-notifications',
+            'top-bar-menu',
+            'top-bar-post' // Include 'My Listings' here
+        ];
+
+        topBarTitles.forEach(id => {
+            const titleElement = document.querySelector(`#${id} .title`);
+            if (titleElement) {
+                titleElement.textContent = ''; // Set to empty string to remove text
+            }
+        });
+
+        // Hide h2 elements in sections and collapse their space
+        const sectionsToAdjust = ['leaderboard', 'menu'];
+        sectionsToAdjust.forEach(sectionId => {
+            const h2 = document.querySelector(`#section-${sectionId} h2`);
+            if (h2) {
+                h2.style.display = 'none';
+                h2.style.margin = '0';
+                h2.style.padding = '0';
+            }
+        });
+
+        // Restore referral section specific texts (these were already correct)
+        const referralTitleDiv = document.querySelector('#section-referral .referral-title');
+        if (referralTitleDiv) {
+            referralTitleDiv.textContent = 'INVITE FRENS';
+            referralTitleDiv.style.display = 'block'; 
+        }
+        const referralDescDiv = document.querySelector('#section-referral .referral-desc');
+        if (referralDescDiv) {
+            referralDescDiv.textContent = 'Score 5% from your buddies’ earned tokens + 1.25% from their referrals.';
+            referralDescDiv.style.display = 'block'; 
+        }
+
+        // Adjust padding/margin for sections to minimize whitespace
+        const leaderboardSection = document.getElementById('section-leaderboard');
+        if (leaderboardSection) {
+            leaderboardSection.style.paddingTop = '10px';
+        }
+        const menuSection = document.getElementById('section-menu');
+        if (menuSection) {
+            menuSection.style.paddingTop = '10px';
+        }
+        const referralHeader = document.querySelector('#section-referral .referral-header');
+        if (referralHeader) {
+            referralHeader.style.marginBottom = '5px';
+        }
+    }
+
+
+    // --- Menu Items Logic ---
+    const menuItems = document.querySelectorAll('.menu-item');
+    menuItems.forEach(item => {
+      item.onclick = function() {
+        const action = this.getAttribute('data-action');
+        if (action === 'notifications') {
+            showSection('notifications');
+        } else if (action === 'view-products') {
+            if (currentUserType === 'seller') {
+                showToast('Switching to buyer view...', 'info');
+                currentUserType = 'buyer'; 
+                showDashboard(); 
+                const browseBtn = document.getElementById('nav-browse-products');
+                if (browseBtn) {
+                  browseBtn.click();
+                }
+            } else {
+                showToast('You are already viewing products!', 'info');
+            }
+        } else if (action === 'search-id') {
+            openSearchModal();
+        } else if (action === 'support') {
+          window.open('mailto:support@knowempire.com?subject=Support%20Request', '_blank'); // Open in new tab
+        } else if (action === 'logout') {
+          showToast('Logging out...', 'info');
+          currentUserType = null;
+          currentUserEmail = ''; 
+          localStorage.removeItem('currentUserType');
+          localStorage.removeItem('currentUserEmail');
+          localStorage.removeItem('userKnowPoints'); 
+          localStorage.removeItem('lastLoginDate'); 
+          console.log('Logout: Cleared user data from localStorage and session globals.');
+          window.location.reload(); 
+        }
+      }
+    });
+
+    // --- Farcaster Wallet Simulation ---
+    document.getElementById('connect-wallet-btn').onclick = function() {
+      console.log('Attempting to connect Farcaster wallet...');
+      setTimeout(() => {
+        const farcasterId = '@remarkablesam';
+        const walletAddress = '0xUQC...DEC';
+        const avatarUrl = 'https://api.dicebear.com/7.x/pixel-art/svg?seed=remarkablesam';
+
+        document.getElementById('profile-username').textContent = farcasterId;
+        document.getElementById('wallet-address').textContent = walletAddress;
+        document.getElementById('profile-avatar').src = avatarUrl;
+
+        document.getElementById('profile-wallet').style.display = 'flex';
+        this.style.display = 'none';
+        showToast('Farcaster Wallet Connected!', 'info'); 
+      }, 1000);
+    };
+
+    document.getElementById('disconnect-wallet').onclick = function() {
+      document.getElementById('profile-username').textContent = '@anonymous';
+      document.getElementById('wallet-address').textContent = 'UQC••••DEC';
+      document.getElementById('profile-avatar').src = 'https://api.dicebear.com/7.x/pixel-art/svg?seed=anon';
+      document.getElementById('profile-wallet').style.display = 'none';
+      document.getElementById('connect-wallet-btn').style.display = 'inline-block';
+      showToast('Farcaster Wallet Disconnected!', 'info');
+    };
+
+    // --- Search by ID Logic ---
+    function openSearchModal() {
+        searchModal.classList.add('active');
+        searchInput.value = '';
+        searchResultsContent.innerHTML = ''; // Clear previous results
+    }
+
+    performSearchBtn.onclick = () => {
+        const queryId = searchInput.value.trim();
+        searchResultsContent.innerHTML = ''; // Clear previous results
+
+        if (!queryId) {
+            searchResultsContent.innerHTML = '<div class="no-results">Please enter an ID to search.</div>';
+            return;
+        }
+
+        let found = false;
+
+        // 1. Search for Product
+        const product = allProducts.find(p => p.id.toUpperCase() === queryId.toUpperCase());
+        if (product) {
+            found = true;
+            searchResultsContent.innerHTML += `
+                <div class="search-results-item">
+                    <strong>Product Found:</strong>
+                    <p><strong>ID:</strong> ${product.id}</p>
+                    <p><strong>Name:</strong> ${product.name}</p>
+                    <p><strong>Description:</strong> ${product.desc}</p>
+                    <p><strong>Price:</strong> $${product.price} KNOW</p>
+                    <p><strong>Category:</strong> ${capitalize(product.category)}</p>
+                    <p><strong>Location:</strong> ${product.location}</p>
+                    <p><strong>Seller:</strong> ${product.sellerHandle}</p>
+                    ${product.image ? `<img src="${product.image}" alt="Product Image" style="max-width:100%; height:auto; border-radius:8px; margin-top:10px;">` : ''}
+                </div>
+            `;
+        }
+
+        // 2. Search for Transactions (Notifications)
+        // Combine notifications from all users to search through
+        let allAppNotifications = [];
+        // Iterate through all localStorage items
+        for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            // Check if the key starts with 'notifications_'
+            if (key.startsWith('notifications_')) {
+                try {
+                    const notifs = JSON.parse(localStorage.getItem(key));
+                    // Ensure notifs is an array before concatenating
+                    if (Array.isArray(notifs)) {
+                        allAppNotifications = allAppNotifications.concat(notifs);
+                    }
+                } catch (e) {
+                    console.error("Error parsing stored notifications:", e);
+                }
+            }
+        }
+        
+        const matchingNotifications = allAppNotifications.filter(notif => 
+            (notif.paymentId && notif.paymentId.toUpperCase() === queryId.toUpperCase()) ||
+            (notif.productId && notif.productId.toUpperCase() === queryId.toUpperCase())
+        );
+
+        if (matchingNotifications.length > 0) {
+            found = true;
+            matchingNotifications.forEach(notif => {
+                let transactionDetails = '';
+                // Customize display based on notification type
+                if (notif.type === 'Goods Purchased' || notif.type === 'Digital Product Purchased') {
+                    transactionDetails = `
+                        <p><strong>ID:</strong> ${notif.paymentId || notif.productId}</p>
+                        <p><strong>Type:</strong> ${notif.type}</p>
+                        <p><strong>Product:</strong> ${notif.productName}</p>
+                        ${notif.quantity ? `<p><strong>Quantity:</strong> ${notif.quantity}</p>` : ''}
+                        ${notif.price ? `<p><strong>Price:</strong> $${(notif.price * (notif.quantity || 1)).toFixed(2)} KNOW</p>` : ''}
+                        <p><strong>Buyer:</strong> ${notif.buyerEmail}</p>
+                        <p><strong>Seller:</strong> ${notif.sellerHandle || notif.sellerEmail}</p>
+                        <p><strong>Timestamp:</strong> ${getFormattedDate(notif.timestamp)}</p>
+                    `;
+                } else if (notif.type === 'Goods Order Inquiry') {
+                     transactionDetails = `
+                        <p><strong>ID:</strong> ${notif.productId}</p>
+                        <p><strong>Type:</strong> ${notif.type}</p>
+                        <p><strong>Product:</strong> ${notif.productName}</p>
+                        <p><strong>Quantity:</strong> ${notif.quantity}</p>
+                        <p><strong>Buyer:</strong> ${notif.buyerEmail}</p>
+                        <p><strong>Status:</strong> ${capitalize(notif.status)}</p>
+                        <p><strong>Timestamp:</strong> ${getFormattedDate(notif.timestamp)}</p>
+                    `;
+                } else if (notif.type === 'Service Request') {
+                     transactionDetails = `
+                        <p><strong>ID:</strong> ${notif.productId}</p>
+                        <p><strong>Type:</strong> ${notif.type}</p>
+                        <p><strong>Service:</strong> ${notif.productName}</p>
+                        <p><strong>Buyer:</strong> ${notif.buyerEmail}</p>
+                        <p><strong>Date:</strong> ${notif.serviceDate}</p>
+                        <p><strong>Time:</strong> ${notif.startTime} - ${notif.endTime}</p>
+                        <p><strong>Location:</strong> ${notif.workLocation}</p>
+                        <p><strong>Status:</strong> ${capitalize(notif.status)}</p>
+                        <p><strong>Timestamp:</strong> ${getFormattedDate(notif.timestamp)}</p>
+                    `;
+                } else {
+                    // Fallback for other notification types
+                    transactionDetails = `<p><strong>Notification Type:</strong> ${notif.type}</p><p><strong>ID:</strong> ${notif.id}</p><p><strong>Content:</strong> ${notif.content || 'N/A'}</p><p><strong>Timestamp:</strong> ${getFormattedDate(notif.timestamp)}</p>`;
+                }
+
+                searchResultsContent.innerHTML += `
+                    <div class="search-results-item">
+                        <strong>Transaction/Notification:</strong>
+                        ${transactionDetails}
+                    </div>
+                `;
+            });
+        }
+
+        if (!found) {
+            searchResultsContent.innerHTML = '<div class="no-results">No product or transaction found with that ID.</div>';
+        }
+    };
+
+    // --- Leaderboard Functionality ---
+    const leaderboardList = document.getElementById('leaderboard-list');
+
+    function generateDummyLeaderboardData() {
+        const dummyUsers = [
+            { handle: '@AliceCrypto', knowPoints: 12500 },
+            { handle: '@BobNFTs', knowPoints: 10200 },
+            { handle: '@CharlieDeFi', knowPoints: 9800 },
+            { handle: '@DanaWeb3', knowPoints: 8500 },
+            { handle: '@EveExplorer', knowPoints: 7300 },
+            { handle: '@FrankieMiner', knowPoints: 6100 },
+            { handle: '@GraceHodler', knowPoints: 5000 },
+            { handle: '@HarryYield', knowPoints: 4200 },
+            { handle: '@IvyLiquidity', knowPoints: 3100 },
+            { handle: '@JackGasFee', knowPoints: 2000 },
+        ];
+        // Merge with current user's points if they are significant
+        if (currentUserEmail && userKnowPoints > 0) {
+            const currentUserHandle = `@${currentUserEmail.split('@')[0]}`;
+            const existingUserIndex = dummyUsers.findIndex(u => u.handle === currentUserHandle);
+            if (existingUserIndex !== -1) {
+                dummyUsers[existingUserIndex].knowPoints = Math.max(dummyUsers[existingUserIndex].knowPoints, userKnowPoints);
+            } else {
+                dummyUsers.push({ handle: currentUserHandle, knowPoints: userKnowPoints });
+            }
+        }
+
+        // Sort by knowPoints descending
+        dummyUsers.sort((a, b) => b.knowPoints - a.knowPoints);
+
+        return dummyUsers;
+    }
+
+    function renderLeaderboard() {
+        leaderboardList.innerHTML = ''; // Clear existing list
+        const leaderboardData = generateDummyLeaderboardData();
+
+        if (leaderboardData.length === 0) {
+            leaderboardList.innerHTML = '<div style="text-align: center; color: var(--muted); padding: 20px;">No leaderboard data available.</div>';
+            return;
+        }
+
+        leaderboardData.forEach((user, index) => {
+            const item = document.createElement('div');
+            item.className = 'leaderboard-item';
+            item.innerHTML = `
+                <div class="rank">${index + 1}.</div>
+                <img src="https://api.dicebear.com/7.x/pixel-art/svg?seed=${user.handle}" alt="Avatar" class="avatar">
+                <div class="info">
+                    <div class="handle">${user.handle}</div>
+                    <div class="points"><span class="points-value">${user.knowPoints.toLocaleString()}</span> Know Points</div>
+                </div>
+            `;
+            leaderboardList.appendChild(item);
+        });
+    }
+
+    // --- Main App Initialization Function ---
+    function initializeMainApp() {
+        console.log("initializeMainApp called.");
+        const storedUserType = localStorage.getItem('currentUserType');
+        const storedUserEmail = localStorage.getItem('currentUserEmail');
+
+        let loggedInUserType = (storedUserType === "null" || storedUserType === null) ? null : storedUserType;
+        let loggedInUserEmail = (storedUserEmail === "null" || storedUserEmail === null) ? '' : storedUserEmail;
+        console.log('Main app init. storedUserEmail:', storedUserEmail, 'storedUserType:', storedUserType);
+        console.log('Main app init. loggedInUserEmail:', loggedInUserEmail, 'loggedInUserType:', loggedInUserType);
+
+        if (loggedInUserType && loggedInUserEmail) {
+            console.log(`Stored user found: Type = ${loggedInUserType}, Email = ${loggedInUserEmail}`);
+            currentUserType = loggedInUserType;
+            currentUserEmail = loggedInUserEmail;
+            landingContent.style.display = 'none'; 
+            showDashboard(); 
+            checkDailyLoginPoints(); 
+        } else {
+            console.log("No stored user found for main app. Displaying landing page for registration.");
+            currentUserType = null;
+            currentUserEmail = '';
+            userNotifications = []; 
+            removeTopBarHeadings(); 
+            landingContent.style.display = 'block'; // Ensure landing content is visible for registration
+            bottomNav.style.display = 'none'; // Ensure bottom nav is hidden
+        }
+    }
+
+
+    // --- Overall Page Load Logic ---
+    window.onload = function() {
+        animateLightning(); // Start the lightning animation
+        // The main app content is initially hidden and will be revealed by clicking "Enter Marketplace"
+        // This ensures the welcome page is fully rendered before any main app logic begins.
+        // `initializeMainApp()` will be called by `enterMarketplaceBtn` click event.
+    };
+  </script>
+</body>
+</html>
