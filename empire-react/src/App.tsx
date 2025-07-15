@@ -3,6 +3,7 @@ import './App.css';
 import empireLogo from './assets/empire-logo.jpg';
 import { FaTwitter, FaTelegramPlane, FaYoutube, FaMoon, FaSun } from 'react-icons/fa';
 import React, { useState, useEffect } from 'react';
+import { useForm } from '@formspree/react';
 
 // Google Fonts CDN for Rubik and Inter
 const fontLink = document.createElement('link');
@@ -16,18 +17,15 @@ interface WaitlistModalProps {
 }
 
 function WaitlistModal({ open, onClose }: WaitlistModalProps) {
-  const [email, setEmail] = useState('');
-  const [success, setSuccess] = useState(false);
+  const [state, handleSubmit] = useForm("mpwlzzaq");
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setSuccess(true);
-    setTimeout(() => {
-      setSuccess(false);
-      setEmail('');
-      onClose();
-    }, 2000);
-  };
+  useEffect(() => {
+    if (state.succeeded) {
+      setTimeout(() => {
+        onClose();
+      }, 2000);
+    }
+  }, [state.succeeded, onClose]);
 
   if (!open) return null;
   return (
@@ -40,16 +38,17 @@ function WaitlistModal({ open, onClose }: WaitlistModalProps) {
           <input
             type="email"
             id="waitlist-email"
-            value={email}
-            onChange={e => setEmail(e.target.value)}
+            name="email"
             required
             placeholder="your@email.com"
             className="input"
           />
-          <button type="submit" className="register-btn">Join Waitlist</button>
+          <button type="submit" className="register-btn" disabled={state.submitting}>
+            {state.submitting ? 'Joining...' : 'Join Waitlist'}
+          </button>
         </form>
-        {success && (
-          <div className="waitlist-success">🎉 You’ve joined the waitlist!</div>
+        {state.succeeded && (
+          <div className="waitlist-success">🎉 You've joined the waitlist!</div>
         )}
       </div>
     </div>
@@ -281,27 +280,27 @@ function RewardCard({ title, subtitle, description }: RewardCardProps) {
   );
 }
 
-// function ThemeToggle() {
-//   const [theme, setTheme] = useState(() => {
-//     const savedTheme = localStorage.getItem('theme');
-//     return savedTheme || 'light';
-//   });
+function ThemeToggle() {
+  const [theme, setTheme] = useState(() => {
+    const savedTheme = localStorage.getItem('theme');
+    return savedTheme || 'light';
+  });
 
-//   useEffect(() => {
-//     document.documentElement.setAttribute('data-theme', theme);
-//     localStorage.setItem('theme', theme);
-//   }, [theme]);
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('theme', theme);
+  }, [theme]);
 
-//   const toggleTheme = () => {
-//     setTheme(prev => prev === 'light' ? 'dark' : 'light');
-//   };
+  const toggleTheme = () => {
+    setTheme(prev => prev === 'light' ? 'dark' : 'light');
+  };
 
-//   return (
-//     <button className="theme-toggle" onClick={toggleTheme} aria-label="Toggle theme">
-//       {theme === 'light' ? <FaMoon size={20} /> : <FaSun size={20} />}
-//     </button>
-//   );
-// }
+  return (
+    <button className="theme-toggle" onClick={toggleTheme} aria-label="Toggle theme">
+      {theme === 'light' ? <FaMoon size={20} /> : <FaSun size={20} />}
+    </button>
+  );
+}
 
 function Navigation() {
   const scrollToSection = (sectionId: string) => {
@@ -322,7 +321,7 @@ function Navigation() {
           <button onClick={() => scrollToSection('features')}>Features</button>
           <button onClick={() => scrollToSection('faq')}>FAQ</button>
           <button onClick={() => scrollToSection('rewards')}>Rewards</button>
-          {/* <ThemeToggle /> */}
+          <ThemeToggle />
         </div>
       </div>
     </nav>
@@ -413,9 +412,9 @@ function App() {
       <footer>
         <div className="footer-content">
           <div className="footer-icons">
-            <a href="https://x.com" target="_blank" rel="noopener noreferrer"><FaTwitter size={28} /></a>
-            <a href="https://telegram.org" target="_blank" rel="noopener noreferrer"><FaTelegramPlane size={28} /></a>
-            <a href="https://youtube.com" target="_blank" rel="noopener noreferrer"><FaYoutube size={28} /></a>
+            <a href="https://x.com/KnowEmpire" target="_blank" rel="noopener noreferrer"><FaTwitter size={28} /></a>
+            <a href="https://t.me/+TPP36QO0JwYzNDJk" target="_blank" rel="noopener noreferrer"><FaTelegramPlane size={28} /></a>
+            <a href="https://youtube.com/@know-empire?si=FRa7oDUTDaSTcnKe" target="_blank" rel="noopener noreferrer"><FaYoutube size={28} /></a>
           </div>
           <div className="copyright">
             © 2025 KnowEmpire. All rights reserved.
