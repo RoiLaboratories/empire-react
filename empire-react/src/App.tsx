@@ -1,9 +1,16 @@
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { useForm } from '@formspree/react';
+import { FaTwitter, FaTelegramPlane, FaYoutube, FaMoon, FaSun } from 'react-icons/fa';
+import toast, { Toaster } from 'react-hot-toast';
+import './components/FarcasterAuth.css';
+import './components/mobile.css';
 import './App.css';
 import empireLogo from './assets/empire-logo.jpg';
-import { FaTwitter, FaTelegramPlane, FaYoutube, FaMoon, FaSun } from 'react-icons/fa';
-import React, { useState, useEffect } from 'react';
-import { useForm } from '@formspree/react';
+import Leaderboard from './components/Leaderboard';
+import { AuthKitProvider, SignInButton } from '@farcaster/auth-kit';
+import '@farcaster/auth-kit/styles.css';
+
 
 // Google Fonts CDN for Rubik and Inter
 const fontLink = document.createElement('link');
@@ -14,49 +21,152 @@ document.head.appendChild(fontLink);
 interface WaitlistModalProps {
   open: boolean;
   onClose: () => void;
+  setModalOpen: (open: boolean) => void;
+}
+
+interface FarcasterUser {
+  fid: string;
+  username: string;
+  displayName?: string;
 }
 
 function WaitlistModal({ open, onClose }: WaitlistModalProps) {
   const [state, handleSubmit] = useForm("mpwlzzaq");
+  const [farcasterUser, setFarcasterUser] = useState<FarcasterUser | null>(null);
+  const [signInError, setSignInError] = useState('');
 
-  useEffect(() => {
-    if (state.succeeded) {
-      setTimeout(() => {
-        onClose();
-      }, 2000);
+  const handleSuccess = (data: any) => {
+    if (data && data.fid) {
+      setFarcasterUser({
+        fid: data.fid.toString(),
+        username: data.username || `farcaster:${data.fid}`,
+        displayName: data.displayName || undefined
+      });
+      setSignInError('');
     }
-  }, [state.succeeded, onClose]);
+  };
+
+  const handleError = (error: { message?: string } | unknown) => {
+    console.error('Farcaster sign in error:', error);
+    setSignInError('Failed to connect with Farcaster. Please ensure you have a Farcaster account and try again.');
+  };
+
+  const [submittedEmails, setSubmittedEmails] = useState<Set<string>>(new Set());
+
+  const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!farcasterUser) {
+      setSignInError('Please sign in with Farcaster first');
+      return;
+    }
+
+    const formData = new FormData(e.currentTarget);
+    const email = formData.get('email') as string;
+
+    if (submittedEmails.has(email)) {
+      toast.error('This email is already on the waitlist', {
+        duration: 4000,
+        position: 'top-right',
+        style: {
+          background: '#ef5350',
+          color: '#fff',
+          fontWeight: 'bold',
+          fontSize: '16px',
+          borderRadius: '10px',
+          padding: '16px',
+        },
+        icon: '⚠️'
+      });
+      return;
+    }
+
+    await handleSubmit(e);
+    
+    // Form submission was successful if there are no errors
+    if (!state.errors) {
+      setSubmittedEmails(prev => new Set([...prev, email]));
+      // Show success toast
+      toast.success("🎉 You've joined the waitlist!", {
+        duration: 4000,
+        position: 'top-right',
+        style: {
+          background: '#4CAF50',
+          color: '#fff',
+          fontWeight: 'bold',
+          fontSize: '16px',
+          borderRadius: '10px',
+          padding: '16px'
+        }
+      });
+    }
+  };
 
   if (!open) return null;
+
   return (
-    <div className="modal-bg" onClick={onClose}>
+    <div className="modal-bg" onClick={(e) => e.stopPropagation()}>
       <div className="modal-content" onClick={e => e.stopPropagation()}>
         <button className="close-btn" onClick={onClose}>&times;</button>
         <h2>Join the Waitlist</h2>
-        <form onSubmit={handleSubmit}>
-          <label htmlFor="waitlist-email">Email Address</label>
-          <input
-            type="email"
-            id="waitlist-email"
-            name="email"
-            required
-            placeholder="your@email.com"
-            className="input"
-          />
-          <button type="submit" className="register-btn" disabled={state.submitting}>
-            {state.submitting ? 'Joining...' : 'Join Waitlist'}
-          </button>
-        </form>
-        {state.succeeded && (
-          <div className="waitlist-success">🎉 You've joined the waitlist!</div>
+        {!farcasterUser ? (
+          <div className="farcaster-signin">
+            <p className="signin-info">Connect your Farcaster account to join the waitlist</p>
+            <SignInButton
+              onSuccess={handleSuccess}
+              onError={handleError}
+            />
+            {signInError && <p className="error-message">{signInError}</p>}
+          </div>
+        ) : (
+          <div>
+            <form onSubmit={handleFormSubmit} className="waitlist-form">
+              <div className="farcaster-info">
+                <p>Signed in as: {farcasterUser?.username}</p>
+              </div>
+              <label htmlFor="waitlist-email">Email Address</label>
+              <input
+                type="email"
+                id="waitlist-email"
+                name="email"
+                required
+                placeholder="your@email.com"
+                className="input"
+              />
+              <input
+                type="hidden"
+                name="farcaster_id"
+                value={farcasterUser?.fid}
+              />
+              <button type="submit" className="register-btn" disabled={state.submitting}>
+                {state.submitting ? 'Joining...' : 'Join Waitlist'}
+              </button>
+            </form>
+            
+            <div className="share-section">
+              <h3>Share with friends to earn points!</h3>
+              <p>Get bonus rewards when your friends join using your referral link</p>
+              <button 
+                className="share-button"
+                onClick={() => {
+                  const shareUrl = `${window.location.origin}?ref=${farcasterUser?.fid}`;
+                  navigator.clipboard.writeText(shareUrl);
+                  toast.success('Referral link copied to clipboard!', {
+                    duration: 2000,
+                    position: 'bottom-center',
+                  });
+                }}
+              >
+                Copy Referral Link
+              </button>
+            </div>
+          </div>
         )}
       </div>
     </div>
   );
 }
 
-function Hero() {
-  const [modalOpen, setModalOpen] = useState(false);
+function Hero({ openModal }: { openModal: () => void }) {
   return (
     <div className="hero-bg">
       <div className="hero-content">
@@ -65,8 +175,7 @@ function Hero() {
         </div>
         <h1 className="hero-title">KnowEmpire</h1>
         <p className="hero-subtitle">The First P2P Marketplace Built on Farcaster</p>
-        <button className="enter-button" onClick={() => setModalOpen(true)}>Join the Waitlist</button>
-        <WaitlistModal open={modalOpen} onClose={() => setModalOpen(false)} />
+        <button className="enter-button" onClick={openModal}>Join the Waitlist</button>
       </div>
     </div>
   );
@@ -250,7 +359,6 @@ interface RewardCardProps {
   title: string;
   subtitle: string;
   description: string;
-  onClick?: () => void;
 }
 
 function RewardCard({ title, subtitle, description }: RewardCardProps) {
@@ -261,8 +369,6 @@ function RewardCard({ title, subtitle, description }: RewardCardProps) {
       whileHover={{ scale: 1.03, boxShadow: '0 8px 32px rgba(108,71,255,0.15)' }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.5 }}
-      onClick={typeof description === 'string' ? undefined : undefined}
-      style={{ cursor: 'pointer' }}
     >
       <div className="reward-card-header">
         <span className="reward-icon">
@@ -280,33 +386,30 @@ function RewardCard({ title, subtitle, description }: RewardCardProps) {
   );
 }
 
-function ThemeToggle() {
-  const [theme, setTheme] = useState(() => {
-    const savedTheme = localStorage.getItem('theme');
-    return savedTheme || 'light';
-  });
 
-  useEffect(() => {
-    document.documentElement.setAttribute('data-theme', theme);
-    localStorage.setItem('theme', theme);
-  }, [theme]);
 
-  const toggleTheme = () => {
-    setTheme(prev => prev === 'light' ? 'dark' : 'light');
-  };
-
-  return (
-    <button className="theme-toggle" onClick={toggleTheme} aria-label="Toggle theme">
-      {theme === 'light' ? <FaMoon size={20} /> : <FaSun size={20} />}
-    </button>
-  );
+interface NavigationProps {
+  toggleTheme: () => void;
+  isDarkMode: boolean;
 }
 
-function Navigation() {
+function Navigation({ toggleTheme, isDarkMode }: NavigationProps) {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   const scrollToSection = (sectionId: string) => {
     const section = document.getElementById(sectionId);
     if (section) {
       section.scrollIntoView({ behavior: 'smooth' });
+      setIsMenuOpen(false);
     }
   };
 
@@ -316,13 +419,49 @@ function Navigation() {
         <div className="nav-logo">
           <img src={empireLogo} alt="Empire Logo" className="nav-logo-img" />
         </div>
-        <div className="nav-links">
-          <button onClick={() => scrollToSection('how-it-works')}>How It Works</button>
-          <button onClick={() => scrollToSection('features')}>Features</button>
-          <button onClick={() => scrollToSection('faq')}>FAQ</button>
-          <button onClick={() => scrollToSection('rewards')}>Rewards</button>
-          <ThemeToggle />
-        </div>
+
+        {/* Desktop Navigation */}
+        {!isMobile && (
+          <div className="nav-links">
+            <button onClick={() => scrollToSection('how-it-works')}>How It Works</button>
+            <button onClick={() => scrollToSection('features')}>Features</button>
+            <button onClick={() => scrollToSection('rewards')}>Rewards</button>
+            <button onClick={() => scrollToSection('top-earners')}>Top Earners</button>
+            <button onClick={() => scrollToSection('faq')}>FAQ</button>
+            <button className="theme-toggle desktop" onClick={toggleTheme} aria-label="Toggle theme">
+              {isDarkMode ? <FaSun size={20} /> : <FaMoon size={20} />}
+            </button>
+          </div>
+        )}
+
+        {/* Mobile Navigation */}
+        {isMobile && (
+          <>
+            <button 
+              className="mobile-menu-btn"
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              aria-label="Toggle menu"
+            >
+              {isMenuOpen ? '✕' : '☰'}
+            </button>
+            <div className={`nav-links ${isMenuOpen ? 'nav-open' : ''}`} onClick={() => setIsMenuOpen(false)}>
+              <div className="nav-menu" onClick={(e) => e.stopPropagation()}>
+                <div className="nav-menu-header">
+                  <span className="nav-menu-title">Menu</span>
+                  <button className="mobile-menu-btn" onClick={() => setIsMenuOpen(false)}>✕</button>
+                </div>
+                <button onClick={() => scrollToSection('how-it-works')}>How It Works</button>
+                <button onClick={() => scrollToSection('features')}>Features</button>
+                <button onClick={() => scrollToSection('rewards')}>Rewards</button>
+                <button onClick={() => scrollToSection('top-earners')}>Top Earners</button>
+                <button onClick={() => scrollToSection('faq')}>FAQ</button>
+              </div>
+            </div>
+            <button className="theme-toggle mobile" onClick={toggleTheme} aria-label="Toggle theme">
+              {isDarkMode ? <FaSun size={20} /> : <FaMoon size={20} />}
+            </button>
+          </>
+        )}
       </div>
     </nav>
   );
@@ -343,29 +482,36 @@ function ScrollToTop() {
 }
 
 function App() {
-  const [modalOpen, setModalOpen] = useState<string | null>(null);
-  const rewards = [
-    {
-      title: 'Daily Streaks',
-      subtitle: 'Earn every day',
-      description: 'Log in daily to build your streak and earn bonus rewards.'
-    },
-    {
-      title: 'Referral Program',
-      subtitle: 'Invite & Earn',
-      description: 'Invite friends and receive a percentage of their rewards.'
-    },
-    {
-      title: 'Special Events',
-      subtitle: 'Limited Time',
-      description: 'Participate in special events for exclusive prizes and badges.'
-    }
-  ];
+  const [modalOpen, setModalOpen] = useState(false);
+  const [darkMode, setDarkMode] = useState(
+    window.matchMedia('(prefers-color-scheme: dark)').matches
+  );
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', darkMode ? 'dark' : 'light');
+  }, [darkMode]);
+
+  const toggleTheme = () => {
+    setDarkMode(!darkMode);
+  };
+
+  const handleModalOpen = () => setModalOpen(true);
+  const handleModalClose = () => setModalOpen(false);
 
   return (
-    <div className="container">
-      <Navigation />
-      <Hero />
+    <AuthKitProvider
+      config={{
+        domain: window.location.host,
+        siweUri: `${window.location.origin}/login`,
+        rpcUrl: "https://mainnet.optimism.io",
+        relay: "https://relay.farcaster.xyz",
+        version: "v1"
+      }}
+    >
+      <Toaster />
+      <div className={`app ${darkMode ? 'dark-theme' : ''}`}>
+        <Navigation toggleTheme={toggleTheme} isDarkMode={darkMode} />
+        <Hero openModal={handleModalOpen} />
       <section id="how-it-works">
         <HowItWorks />
       </section>
@@ -376,45 +522,47 @@ function App() {
         <h2 className="section-title">Empire Rewards</h2>
         <p className="section-subtitle">Unlock exclusive benefits</p>
         <div className="rewards-grid">
-          {rewards.map(r => (
+          {[
+            {
+              title: 'Daily Streaks',
+              subtitle: 'Earn every day',
+              description: 'Log in daily to build your streak and earn bonus rewards.'
+            },
+            {
+              title: 'Referral Program',
+              subtitle: 'Invite & Earn',
+              description: 'Invite friends and receive a percentage of their rewards.'
+            },
+            {
+              title: 'Special Events',
+              subtitle: 'Limited Time',
+              description: 'Participate in special events for exclusive prizes and badges.'
+            }
+          ].map(reward => (
             <RewardCard
-              key={r.title}
-              title={r.title}
-              subtitle={r.subtitle}
-              description={r.description}
-              onClick={() => setModalOpen(r.title)}
+              key={reward.title}
+              {...reward}
             />
           ))}
         </div>
       </section>
+      <Leaderboard />
       <section id="faq">
         <FAQ />
       </section>
-      {modalOpen && (
-        <div className="modal-bg" onClick={() => setModalOpen(null)}>
-          <motion.div
-            className="reward-modal"
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.9 }}
-            transition={{ duration: 0.3 }}
-            onClick={e => e.stopPropagation()}
-          >
-            <button className="close-btn" onClick={() => setModalOpen(null)}>&times;</button>
-            <RewardCard
-              title={rewards.find(r => r.title === modalOpen)?.title || ''}
-              subtitle={rewards.find(r => r.title === modalOpen)?.subtitle || ''}
-              description={rewards.find(r => r.title === modalOpen)?.description || ''}
-            />
-          </motion.div>
-        </div>
-      )}
+      <WaitlistModal open={modalOpen} onClose={handleModalClose} setModalOpen={setModalOpen} />
       <footer>
         <div className="footer-content">
           <div className="footer-icons">
-            <a href="https://x.com/KnowEmpire" target="_blank" rel="noopener noreferrer"><FaTwitter size={28} /></a>
-            <a href="https://t.me/+TPP36QO0JwYzNDJk" target="_blank" rel="noopener noreferrer"><FaTelegramPlane size={28} /></a>
-            <a href="https://youtube.com/@know-empire?si=FRa7oDUTDaSTcnKe" target="_blank" rel="noopener noreferrer"><FaYoutube size={28} /></a>
+            <a href="https://x.com/KnowEmpire" target="_blank" rel="noopener noreferrer">
+              <FaTwitter size={28} />
+            </a>
+            <a href="https://t.me/+TPP36QO0JwYzNDJk" target="_blank" rel="noopener noreferrer">
+              <FaTelegramPlane size={28} />
+            </a>
+            <a href="https://youtube.com/@know-empire?si=FRa7oDUTDaSTcnKe" target="_blank" rel="noopener noreferrer">
+              <FaYoutube size={28} />
+            </a>
           </div>
           <div className="copyright">
             © 2025 KnowEmpire. All rights reserved.
@@ -423,7 +571,8 @@ function App() {
         </div>
       </footer>
     </div>
-  );
+  </AuthKitProvider>
+);
 }
 
 export default App;

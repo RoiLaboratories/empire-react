@@ -1,0 +1,256 @@
+.leaderboard {
+  padding: 6rem 0;
+  background: var(--bg-secondary);
+  width: 100%;
+}
+
+.leaderboard-wrapper {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.leaderboard .section-title {
+  text-align: center;
+  margin-bottom: 1rem;
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  font-family: 'Rubik', sans-serif;
+  width: 100%;
+}
+
+.leaderboard .section-subtitle {
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 1.1rem;
+  margin-bottom: 3rem;
+  font-family: 'Inter', sans-serif;
+  width: 100%;
+}
+
+.leaderboard-table-container {
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+  background: var(--bg-secondary);
+  border-radius: 20px;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 4px 20px var(--shadow-color);
+  overflow: hidden;
+  padding: 0;
+}
+
+.leaderboard-grid {
+  display: grid;
+  grid-template-columns: 100px minmax(200px, 1fr) 150px 150px;
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+/* Common cell styles */
+.leaderboard-header > div,
+.leaderboard-row > div {
+  padding: 1.5rem;
+  background: var(--card-bg);
+  transition: background-color 0.3s ease;
+}
+
+/* Header styles */
+.leaderboard-header {
+  display: contents;
+}
+
+.leaderboard-header > div {
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-secondary);
+  border-bottom: 2px solid var(--border-color);
+}
+
+/* Row styles */
+.leaderboard-row {
+  display: contents;
+}
+
+/* Column alignment */
+.leaderboard-header > div:first-child,
+.leaderboard-row > div:first-child,
+.leaderboard-header > div:nth-child(3),
+.leaderboard-header > div:nth-child(4),
+.leaderboard-row > div:nth-child(3),
+.leaderboard-row > div:nth-child(4) {
+  text-align: center;
+}
+
+.leaderboard-header > div:nth-child(2),
+.leaderboard-row > div:nth-child(2) {
+  text-align: left;
+  padding-left: 2rem;
+}
+
+/* Row hover effects */
+.leaderboard-row > div {
+  border-bottom: 1px solid var(--border-color);
+}
+
+.leaderboard-row:hover > div {
+  background: var(--card-bg);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px var(--shadow-color);
+}
+
+.leaderboard-row:hover > div:first-child::before {
+  opacity: 1;
+}
+
+.leaderboard-row > div:first-child::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.medal {
+  width: 24px;
+  height: 24px;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+  margin: 0 auto;
+  display: block;
+}
+
+.rank-number {
+  font-size: 1.1rem;
+  font-weight: 600;
+  font-family: 'Inter', sans-serif;
+  color: var(--text-secondary);
+  text-align: center;
+  display: block;
+}
+
+.user-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.username {
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  font-weight: 600;
+  font-family: 'Inter', sans-serif;
+}
+
+.display-name {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  font-family: 'Inter', sans-serif;
+}
+
+.stat-value {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--primary-color);
+  font-family: 'Inter', sans-serif;
+  text-align: center;
+  display: block;
+}
+
+.leaderboard-loading {
+  text-align: center;
+  color: var(--text-secondary);
+  padding: 2rem;
+  font-size: 1.1rem;
+}
+
+/* Mobile Responsiveness */
+@media screen and (max-width: 768px) {
+  .leaderboard {
+    padding: 4rem 1rem;
+  }
+
+  .leaderboard-grid {
+    grid-template-columns: 60px minmax(140px, 1fr) 100px 100px;
+  }
+
+  .leaderboard-header > div,
+  .leaderboard-row > div {
+    padding: 1rem;
+  }
+
+  .leaderboard-header > div:nth-child(2),
+  .leaderboard-row > div:nth-child(2) {
+    padding-left: 1.5rem;
+  }
+
+  .medal {
+    width: 22px;
+    height: 22px;
+  }
+
+  .stat-value,
+  .username {
+    font-size: 0.9rem;
+  }
+
+  .display-name {
+    font-size: 0.8rem;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .leaderboard {
+    padding: 3rem 1rem;
+  }
+
+  .leaderboard .section-title {
+    font-size: 2rem;
+  }
+
+  .leaderboard .section-subtitle {
+    font-size: 1rem;
+  }
+
+  .leaderboard-grid {
+    grid-template-columns: 50px minmax(120px, 1fr) 80px 80px;
+  }
+
+  .leaderboard-header > div,
+  .leaderboard-row > div {
+    padding: 0.875rem;
+  }
+
+  .leaderboard-header > div:nth-child(2),
+  .leaderboard-row > div:nth-child(2) {
+    padding-left: 1.25rem;
+  }
+
+  .medal {
+    width: 20px;
+    height: 20px;
+  }
+
+  .rank-number {
+    font-size: 1rem;
+  }
+
+  .username {
+    font-size: 0.85rem;
+  }
+
+  .display-name {
+    font-size: 0.75rem;
+  }
+}

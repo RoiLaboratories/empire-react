@@ -1,0 +1,136 @@
+.farcaster-signin {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  text-align: center;
+  padding: 20px;
+}
+
+.signin-info {
+  font-size: 1.1rem;
+  color: var(--text-primary);
+  margin-bottom: 10px;
+}
+
+.loading-dots::after {
+  content: '...';
+  animation: dots 1.5s steps(4, end) infinite;
+  display: inline-block;
+  width: 20px;
+  text-align: left;
+}
+
+@keyframes dots {
+  0%, 20% { content: ''; }
+  40% { content: '.'; }
+  60% { content: '..'; }
+  80%, 100% { content: '...'; }
+}
+
+.farcaster-button {
+  width: 100%;
+  max-width: 300px;
+  padding: 12px 24px;
+  background: #6C47FF;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: 'Inter', sans-serif;
+  position: relative;
+  overflow: hidden;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.farcaster-button:disabled {
+  opacity: 0.7;
+  background: #9B87FF;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
+  pointer-events: none;
+}
+
+.farcaster-button:not(:disabled):hover {
+  background: #5234CC;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(108, 71, 255, 0.2);
+}
+
+.farcaster-button:not(:disabled):active {
+  transform: translateY(0);
+  box-shadow: 0 2px 6px rgba(108, 71, 255, 0.15);
+}
+
+.qr-code-container {
+  width: 100%;
+  max-width: 300px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 20px;
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+}
+
+.qr-code-container p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.qr-code-hint {
+  margin-top: 12px !important;
+}
+
+.qr-code-hint a {
+  color: #6C47FF;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.qr-code-hint a:hover {
+  text-decoration: underline;
+}
+
+.error-message {
+  color: #ff4d4d;
+  font-size: 0.9rem;
+  margin-top: 12px;
+  text-align: center;
+}
+
+.farcaster-info {
+  width: 100%;
+  background-color: var(--card-bg);
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  border: 1px solid var(--border-color);
+  text-align: center;
+}
+
+@media (max-width: 480px) {
+  .farcaster-button {
+    max-width: 100%;
+    font-size: 0.95rem;
+    padding: 10px 20px;
+  }
+
+  .qr-code-container {
+    max-width: 100%;
+    padding: 16px;
+  }
+
+  .qr-code-container p {
+    font-size: 0.85rem;
+  }
+}
