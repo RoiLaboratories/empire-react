@@ -62,6 +62,7 @@ function WaitlistModal({ open, onClose }: WaitlistModalProps) {
 
     const formData = new FormData(e.currentTarget);
     const email = formData.get('email') as string;
+    const referralSource = formData.get('referral_source');
 
     if (submittedEmails.has(email)) {
       toast.error('This email is already on the waitlist', {
@@ -80,13 +81,26 @@ function WaitlistModal({ open, onClose }: WaitlistModalProps) {
       return;
     }
 
+    // Add timestamp to track when users join
+    formData.append('timestamp', new Date().toISOString());
+    
+    // Add referral data
+    if (referralSource) {
+      formData.append('referred_by', referralSource as string);
+    }
+
     await handleSubmit(e);
     
     // Form submission was successful if there are no errors
     if (!state.errors) {
       setSubmittedEmails(prev => new Set([...prev, email]));
-      // Show success toast
-      toast.success("🎉 You've joined the waitlist!", {
+      
+      // Show success toast with referral info if applicable
+      const message = referralSource 
+        ? "🎉 You've joined the waitlist! Referral bonus will be credited."
+        : "🎉 You've joined the waitlist!";
+        
+      toast.success(message, {
         duration: 4000,
         position: 'top-right',
         style: {
@@ -136,6 +150,21 @@ function WaitlistModal({ open, onClose }: WaitlistModalProps) {
                 type="hidden"
                 name="farcaster_id"
                 value={farcasterUser?.fid}
+              />
+              <input
+                type="hidden"
+                name="farcaster_username"
+                value={farcasterUser?.username}
+              />
+              <input
+                type="hidden"
+                name="farcaster_display_name"
+                value={farcasterUser?.displayName || ''}
+              />
+              <input
+                type="hidden"
+                name="referral_source"
+                value={new URLSearchParams(window.location.search).get('ref') || ''}
               />
               <button type="submit" className="register-btn" disabled={state.submitting}>
                 {state.submitting ? 'Joining...' : 'Join Waitlist'}
