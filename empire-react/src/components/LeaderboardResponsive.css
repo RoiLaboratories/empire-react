@@ -1,0 +1,21 @@
+/* Mobile styles for leaderboard */
+@media (max-width: 767px) {
+  .desktop-table {
+    display: none !important;
+  }
+  
+  .mobile-table {
+    display: block;
+  }
+}
+
+/* Desktop styles for leaderboard */
+@media (min-width: 768px) {
+  .desktop-table {
+    display: block;
+  }
+  
+  .mobile-table {
+    display: none !important;
+  }
+}

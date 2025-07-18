@@ -3,9 +3,8 @@ import { motion } from 'framer-motion';
 import { useForm } from '@formspree/react';
 import { FaTwitter, FaTelegramPlane, FaYoutube, FaMoon, FaSun } from 'react-icons/fa';
 import toast, { Toaster } from 'react-hot-toast';
-import './components/FarcasterAuth.css';
-import './components/mobile.css';
 import './App.css';
+import './mobile.css';
 import empireLogo from './assets/empire-logo.jpg';
 import Leaderboard from './components/Leaderboard';
 import { AuthKitProvider, SignInButton } from '@farcaster/auth-kit';
@@ -242,7 +241,7 @@ function HowItWorks() {
   ];
   return (
     <section className="how-it-works">
-      <h2>How It Works</h2>
+                    <h2 className="text-2xl md:text-3xl font-bold text-center mb-8 text-text-color">How It Works</h2>
       <div className="how-cards">
         {steps.map((step, idx) => (
           <motion.div className="how-card" key={idx} initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 + idx * 0.1 }}>
