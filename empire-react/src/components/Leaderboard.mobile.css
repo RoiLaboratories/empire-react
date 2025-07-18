@@ -1,0 +1,63 @@
+/* Mobile-specific styles for the leaderboard */
+@media (max-width: 768px) {
+  .leaderboard {
+    padding: 3rem 0;
+  }
+
+  .leaderboard-wrapper {
+    padding: 0;
+    margin: 0 1rem;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .leaderboard-table {
+    margin: 0;
+    min-width: 600px;
+  }
+
+  .leaderboard-table table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+  }
+
+  .leaderboard-table th {
+    position: sticky;
+    top: 0;
+    background: var(--card-bg);
+    z-index: 10;
+    font-size: 0.875rem;
+    padding: 0.75rem;
+    white-space: nowrap;
+  }
+
+  .leaderboard-table td {
+    font-size: 0.875rem;
+    padding: 0.75rem;
+    white-space: nowrap;
+  }
+
+  .leaderboard .section-title {
+    font-size: 1.75rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .leaderboard .section-subtitle {
+    font-size: 0.9rem;
+    margin-bottom: 2rem;
+    padding: 0 1rem;
+  }
+
+  /* Add fade effect to indicate scrolling */
+  .leaderboard-wrapper::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 20px;
+    background: linear-gradient(to right, transparent, var(--bg-secondary));
+    pointer-events: none;
+  }
+}

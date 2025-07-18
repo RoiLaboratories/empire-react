@@ -1,0 +1,78 @@
+.leaderboard {
+  position: relative;
+}
+
+.desktopView {
+  display: none;
+}
+
+.mobileView {
+  display: block;
+}
+
+@media (min-width: 768px) {
+  .desktopView {
+    display: block;
+  }
+
+  .mobileView {
+    display: none;
+  }
+}
+
+.wrapper {
+  width: 100%;
+  max-width: 100vw;
+  margin: 0 -1rem;
+  position: relative;
+}
+
+.tableContainer {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 0 1rem;
+  margin-bottom: 1rem;
+}
+
+.table {
+  width: 100%;
+  min-width: 650px;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.headerCell {
+  font-size: 0.875rem;
+  font-weight: 600;
+  padding: 1rem;
+  background: var(--card-bg);
+  color: var(--text-secondary);
+  text-align: left;
+  border-bottom: 2px solid var(--border-color);
+  white-space: nowrap;
+}
+
+.bodyCell {
+  font-size: 0.875rem;
+  padding: 0.875rem 1rem;
+  border-bottom: 1px solid var(--border-color);
+  background: var(--card-bg);
+  white-space: nowrap;
+}
+
+/* First column (Rank) styles */
+.headerCell:first-child,
+.bodyCell:first-child {
+  padding-left: 1.5rem;
+  width: 80px;
+}
+
+/* Last column styles */
+.headerCell:last-child,
+.bodyCell:last-child {
+  padding-right: 1.5rem;
+}

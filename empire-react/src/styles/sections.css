@@ -1,0 +1,18 @@
+/* Fix for white lines between sections */
+section {
+  position: relative;
+  margin-bottom: -1px !important;
+}
+
+/* Ensure no extra spacing in mobile view */
+@media (max-width: 767px) {
+  section {
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+  }
+  
+  /* Remove any extra margins that might cause gaps */
+  section > div:last-child {
+    margin-bottom: 0;
+  }
+}
