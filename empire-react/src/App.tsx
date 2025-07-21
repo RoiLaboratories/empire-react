@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { useForm } from '@formspree/react';
 import { FaTwitter, FaTelegramPlane, FaYoutube, FaMoon, FaSun } from 'react-icons/fa';
+import { submitWaitlistEntry, checkEmailExists, getReferralCount } from './lib/database';
 import toast, { Toaster } from 'react-hot-toast';
 import './App.css';
 import './mobile.css';
@@ -30,11 +30,12 @@ interface FarcasterUser {
 }
 
 function WaitlistModal({ open, onClose }: WaitlistModalProps) {
-  const [state, handleSubmit] = useForm("mpwlzzaq");
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [farcasterUser, setFarcasterUser] = useState<FarcasterUser | null>(null);
   const [signInError, setSignInError] = useState('');
+  const [referralCount, setReferralCount] = useState<number | null>(null);
 
-  const handleSuccess = (data: any) => {
+  const handleSuccess = async (data: any) => {
     if (data && data.fid) {
       setFarcasterUser({
         fid: data.fid.toString(),
@@ -50,8 +51,6 @@ function WaitlistModal({ open, onClose }: WaitlistModalProps) {
     setSignInError('Failed to connect with Farcaster. Please ensure you have a Farcaster account and try again.');
   };
 
-  const [submittedEmails, setSubmittedEmails] = useState<Set<string>>(new Set());
-
   const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!farcasterUser) {
@@ -59,42 +58,48 @@ function WaitlistModal({ open, onClose }: WaitlistModalProps) {
       return;
     }
 
+    setIsSubmitting(true);
     const formData = new FormData(e.currentTarget);
     const email = formData.get('email') as string;
-    const referralSource = formData.get('referral_source');
+    const referralSource = formData.get('referral_source') as string;
 
-    if (submittedEmails.has(email)) {
-      toast.error('This email is already on the waitlist', {
-        duration: 4000,
-        position: 'top-right',
-        style: {
-          background: '#ef5350',
-          color: '#fff',
-          fontWeight: 'bold',
-          fontSize: '16px',
-          borderRadius: '10px',
-          padding: '16px',
-        },
-        icon: '⚠️'
+    try {
+      // Check if email already exists
+      const emailExists = await checkEmailExists(email);
+      if (emailExists) {
+        toast.error('This email is already on the waitlist', {
+          duration: 4000,
+          position: 'top-right',
+          style: {
+            background: '#ef5350',
+            color: '#fff',
+            fontWeight: 'bold',
+            fontSize: '16px',
+            borderRadius: '10px',
+            padding: '16px',
+          },
+          icon: '⚠️'
+        });
+        setIsSubmitting(false);
+        return;
+      }
+
+      // Submit to Supabase
+      await submitWaitlistEntry({
+        email,
+        farcaster_id: farcasterUser.fid,
+        farcaster_username: farcasterUser.username,
+        farcaster_display_name: farcasterUser.displayName || null,
+        referral_source: referralSource || null
       });
-      return;
-    }
 
-    // Add timestamp to track when users join
-    formData.append('timestamp', new Date().toISOString());
-    
-    // Add referral data
-    if (referralSource) {
-      formData.append('referred_by', referralSource as string);
-    }
-
-    await handleSubmit(e);
-    
-    // Form submission was successful if there are no errors
-    if (!state.errors) {
-      setSubmittedEmails(prev => new Set([...prev, email]));
+      // Update referral count if this was a referral
+      if (referralSource) {
+        const newCount = await getReferralCount(referralSource);
+        setReferralCount(newCount);
+      }
       
-      // Show success toast with referral info if applicable
+      // Show success toast
       const message = referralSource 
         ? "🎉 You've joined the waitlist! Referral bonus will be credited."
         : "🎉 You've joined the waitlist!";
@@ -111,6 +116,22 @@ function WaitlistModal({ open, onClose }: WaitlistModalProps) {
           padding: '16px'
         }
       });
+
+      // Close modal after successful submission
+      onClose();
+    } catch (error) {
+      console.error('Error submitting to waitlist:', error);
+      let errorMessage = 'Failed to join waitlist. Please try again.';
+      if (error instanceof Error) {
+        if (error.message.includes('duplicate key')) {
+          errorMessage = 'This email is already registered.';
+        } else if (error.message.includes('auth')) {
+          errorMessage = 'Authentication error. Please try signing in again.';
+        }
+      }
+      toast.error(errorMessage);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -165,13 +186,16 @@ function WaitlistModal({ open, onClose }: WaitlistModalProps) {
                 name="referral_source"
                 value={new URLSearchParams(window.location.search).get('ref') || ''}
               />
-              <button type="submit" className="register-btn" disabled={state.submitting}>
-                {state.submitting ? 'Joining...' : 'Join Waitlist'}
+              <button type="submit" className="register-btn" disabled={isSubmitting}>
+                {isSubmitting ? 'Joining...' : 'Join Waitlist'}
               </button>
             </form>
             
             <div className="share-section">
               <h3>Share with friends to earn points!</h3>
+              {referralCount !== null && (
+                <p className="referral-count">You've referred {referralCount} {referralCount === 1 ? 'person' : 'people'} so far!</p>
+              )}
               <p>Get bonus rewards when your friends join using your referral link</p>
               <button 
                 className="share-button"
@@ -353,8 +377,8 @@ function FAQ() {
       a: 'Yes, escrow is used for all transactions to ensure safety.'
     },
     {
-      q: 'Can I sell digital products?',
-      a: 'Yes, you can sell goods, services, or digital products.'
+      q: 'Do I need a wallet to use Know Empire?',
+      a: 'Yes, since Know Empire runs onchain, you’ll need a crypto wallet to sign in and handle payments.'
     }
   ];
   return (
