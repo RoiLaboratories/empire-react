@@ -1,12 +1,13 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import './Leaderboard.css';
 import styles from './Leaderboard.module.css';
+import { getLeaderboardData, subscribeToLeaderboardUpdates } from '../lib/database';
 
 interface LeaderboardEntry {
   fid: number;
-  username: string;  // Farcaster username
-  displayName?: string;  // Optional Farcaster display name
+  username: string;
+  displayName?: string;
   referralCount: number;
   points: number;
 }
@@ -22,71 +23,45 @@ function Leaderboard() {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  useEffect(() => {
-    // Using mock data until the API is ready
-    const mockData: LeaderboardEntry[] = [
-      {
-        fid: 1,
-        username: "degen.eth",
-        displayName: "Crypto Degen",
-        referralCount: 156,
-        points: 15600
-      },
-      {
-        fid: 2,
-        username: "traderpro",
-        displayName: "Master Trader",
-        referralCount: 142,
-        points: 14200
-      },
-      {
-        fid: 3,
-        username: "nftwhale",
-        displayName: "NFT Collector",
-        referralCount: 128,
-        points: 12800
-      },
-      {
-        fid: 4,
-        username: "builder",
-        displayName: "Web3 Builder",
-        referralCount: 115,
-        points: 11500
-      },
-      {
-        fid: 5,
-        username: "cryptoqueen",
-        displayName: "Crypto Queen",
-        referralCount: 98,
-        points: 9800
-      }
-    ];
+  const [error, setError] = useState<string | null>(null);
 
-    // Simulate API call with mock data
-    setTimeout(() => {
-      setLeaderboard(mockData);
-      setIsLoading(false);
-    }, 1000);
-
-    // TODO: Uncomment when API is ready
-    // const fetchLeaderboard = async () => {
-    //   try {
-    //     const response = await fetch('/api/leaderboard');
-    //     if (!response.ok) {
-    //       throw new Error(`HTTP error! status: ${response.status}`);
-    //     }
-    //     const data = await response.json();
-    //     setLeaderboard(data);
-    //   } catch (error) {
-    //     console.error('Failed to fetch leaderboard:', error);
-    //     // Use mock data as fallback
-    //     setLeaderboard(mockData);
-    //   } finally {
-    //     setIsLoading(false);
-    //   }
-    // };
-    // fetchLeaderboard();
+  const handleLeaderboardUpdate = useCallback((data: LeaderboardEntry[]) => {
+    setLeaderboard(data);
+    setIsLoading(false);
   }, []);
+
+  useEffect(() => {
+    let cleanup: (() => void) | undefined;
+
+    const initializeLeaderboard = async () => {
+      try {
+        // Initial fetch
+        const data = await getLeaderboardData();
+        setLeaderboard(data);
+        setIsLoading(false);
+
+        // Subscribe to real-time updates
+        cleanup = subscribeToLeaderboardUpdates(async () => {
+          // Fetch fresh data when changes occur
+          const updatedData = await getLeaderboardData();
+          setLeaderboard(updatedData);
+        });
+      } catch (error) {
+        console.error('Failed to fetch leaderboard:', error);
+        setError('Failed to load leaderboard data. Please try again later.');
+        setIsLoading(false);
+      }
+    };
+
+    initializeLeaderboard();
+
+    // Cleanup subscription when component unmounts
+    return () => {
+      if (cleanup) {
+        cleanup();
+      }
+    };
+  }, [handleLeaderboardUpdate]);
 
   const getMedalIcon = (rank: number) => {
     const size = window.innerWidth < 768 ? 18 : 24;
@@ -113,6 +88,24 @@ function Leaderboard() {
         return <span className="rank-number text-sm md:text-base">{rank}</span>;
     }
   };
+
+  if (error) {
+    return (
+      <section id="top-earners" className="leaderboard">
+        <h2 className="section-title">Leaderboard</h2>
+        <p className="section-subtitle">Leading the Empire's Growth</p>
+        <div className="leaderboard-error">
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5 }}
+          >
+            {error}
+          </motion.div>
+        </div>
+      </section>
+    );
+  }
 
   if (isLoading) {
     return (
