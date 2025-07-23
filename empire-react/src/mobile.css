@@ -1,13 +1,186 @@
 /* Mobile-specific styles for the entire app */
 @media (max-width: 768px) {
+  /* Mobile Navigation */
+  .nav-bar {
+    padding: 8px 16px;
+    background: var(--background-color);
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    box-shadow: 0 1px 0 0 rgba(0, 0, 0, 0.05);
+    backdrop-filter: blur(8px);
+    height: 60px;
+  }
+
+  .mobile-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 100%;
+    width: 100%;
+  }
+
+  .nav-logo {
+    margin: 0;
+    padding: 0;
+    display: flex;
+    align-items: center;
+  }
+
+  .nav-logo-img {
+    height: 28px;
+    width: auto;
+    object-fit: contain;
+    margin-right: auto;
+  }
+
+  .mobile-menu-btn {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    color: var(--text-color);
+    font-size: 20px;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: background-color 0.2s ease;
+  }
+
+  .mobile-menu-btn:active {
+    background-color: var(--button-active-bg, rgba(0, 0, 0, 0.05));
+  }
+
+  .mobile-nav-menu {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.75);
+    opacity: 0;
+    visibility: hidden;
+    z-index: 999;
+  }
+
+  .mobile-nav-menu.show {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .mobile-nav-content {
+    position: fixed;
+    top: 80px;
+    right: 20px;
+    width: 300px;
+    height: calc(100vh - 100px);
+    background: var(--modal-bg, #1a1a1a);
+    color: var(--modal-text, #ffffff);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    padding: 24px;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 16px;
+    overflow-y: auto;
+    transform: translateX(100%);
+  }
+
+  .mobile-nav-menu.show .mobile-nav-content {
+    transform: translateX(0);
+  }
+
+  .mobile-nav-content .menu-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .menu-header h3 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #fff;
+    margin: 0;
+  }
+
+  .menu-header .mobile-menu-btn {
+    width: 32px;
+    height: 32px;
+    font-size: 18px;
+    padding: 0;
+    color: #fff;
+    opacity: 0.8;
+  }
+
+  .mobile-nav-content button {
+    width: 100%;
+    text-align: left;
+    padding: 14px;
+    font-size: 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: none;
+    color: #fff;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    transition: all 0.2s ease;
+    font-weight: 500;
+  }
+
+  .mobile-nav-content button:active {
+    background: rgba(255, 255, 255, 0.1);
+    transform: scale(0.98);
+  }
+
+  .mobile-nav-content button:hover {
+    background: rgba(255, 255, 255, 0.08);
+  }
+
+  .theme-toggle.mobile {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 24px;
+    padding: 14px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    color: #fff;
+  }
+
+  .theme-toggle.mobile svg {
+    width: 20px;
+    height: 20px;
+    color: #fff;
+    opacity: 0.9;
+  }
+
+  .theme-label {
+    font-size: 0.95rem;
+    color: #fff;
+    font-weight: 500;
+    opacity: 0.9;
+  }
+
   /* How It Works section */
-  #how-it-works {
+  .how-it-works {
     padding: 3rem 0;
+    border-bottom: none !important;
   }
 
   #how-it-works h2 {
     font-size: 1.75rem;
     margin-bottom: 2rem;
+  }
+
+  /* Hero section */
+  .hero-bg {
+    margin-top: 60px; /* Account for fixed header */
+    border-bottom: none !important;
   }
 
   /* Rewards section */
@@ -17,7 +190,8 @@
 
   #rewards h2 {
     font-size: 1.75rem;
-    margin-bottom: 1rem;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
   }
 
   #rewards p {
@@ -33,6 +207,15 @@
   #faq h2 {
     font-size: 1.75rem;
     margin-bottom: 2rem;
+  }
+
+  /* Section Title Styles */
+  .section-title,
+  #rewards h2,
+  .leaderboard .section-title {
+    font-size: 1.75rem;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
   }
 
   /* General section spacing */
