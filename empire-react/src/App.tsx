@@ -164,7 +164,7 @@ function WaitlistModal({ open, onClose }: WaitlistModalProps) {
             </div>
             
             <div className="share-section">
-              <h3>Share with friends to earn more points!</h3>
+              <h3>Share with friends to earn $KNOW points!</h3>
               {farcasterUser && referralCount !== null && referralCount > 0 && (
                 <p className="referral-count">You've referred {referralCount} {referralCount === 1 ? 'person' : 'people'} so far!</p>
               )}
