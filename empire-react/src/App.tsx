@@ -20,7 +20,6 @@ document.head.appendChild(fontLink);
 interface WaitlistModalProps {
   open: boolean;
   onClose: () => void;
-  setModalOpen: (open: boolean) => void;
 }
 
 interface FarcasterUser {
@@ -37,11 +36,12 @@ function WaitlistModal({ open, onClose }: WaitlistModalProps) {
 
   const handleSuccess = async (data: any) => {
     if (data && data.fid) {
-      setFarcasterUser({
+      const user = {
         fid: data.fid.toString(),
         username: data.username || `farcaster:${data.fid}`,
         displayName: data.displayName || undefined
-      });
+      };
+      setFarcasterUser(user);
       setSignInError('');
     }
   };
@@ -93,18 +93,14 @@ function WaitlistModal({ open, onClose }: WaitlistModalProps) {
         referral_source: referralSource || null
       });
 
-      // Update referral count if this was a referral
-      if (referralSource) {
-        const newCount = await getReferralCount(referralSource);
+      // Only get referral count for the user who is signing in (not for referred users)
+      if (!referralSource) {
+        const newCount = await getReferralCount(farcasterUser.fid);
         setReferralCount(newCount);
       }
       
       // Show success toast
-      const message = referralSource 
-        ? "🎉 You've joined the waitlist! Referral bonus will be credited."
-        : "🎉 You've joined the waitlist!";
-        
-      toast.success(message, {
+      toast.success("🎉 You've joined the waitlist!", {
         duration: 4000,
         position: 'top-right',
         style: {
@@ -117,8 +113,11 @@ function WaitlistModal({ open, onClose }: WaitlistModalProps) {
         }
       });
 
-      // Close modal after successful submission
-      onClose();
+      // Close waitlist modal after a brief delay
+      requestAnimationFrame(() => {
+        onClose();
+        console.log('Waitlist modal closed');
+      });
     } catch (error) {
       console.error('Error submitting to waitlist:', error);
       let errorMessage = 'Failed to join waitlist. Please try again.';
@@ -193,23 +192,37 @@ function WaitlistModal({ open, onClose }: WaitlistModalProps) {
             
             <div className="share-section">
               <h3>Share with friends to earn points!</h3>
-              {referralCount !== null && (
+              {farcasterUser && referralCount !== null && referralCount > 0 && (
                 <p className="referral-count">You've referred {referralCount} {referralCount === 1 ? 'person' : 'people'} so far!</p>
               )}
               <p>Get bonus rewards when your friends join using your referral link</p>
-              <button 
-                className="share-button"
-                onClick={() => {
-                  const shareUrl = `${window.location.origin}?ref=${farcasterUser?.fid}`;
-                  navigator.clipboard.writeText(shareUrl);
-                  toast.success('Referral link copied to clipboard!', {
-                    duration: 2000,
-                    position: 'bottom-center',
-                  });
-                }}
-              >
-                Copy Referral Link
-              </button>
+              <div className="flex justify-between w-full px-16 mt-6">
+                {farcasterUser && (
+                  <>
+                    <a 
+                      href={`https://warpcast.com/~/compose?text=I%20just%20joined%20the%20@knowempire%20waitlist%20and%20earned%20100%20$KNOW%20points!%20🎉%0A%0AJoin%20now%20using%20my%20referral%20link:%20${window.location.origin}?ref=${farcasterUser.fid}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-center w-[45%] px-6 py-3 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-900 dark:text-white rounded-lg transition-colors duration-200 shadow-sm"
+                    >
+                      Share on Farcaster
+                    </a>
+                    <button 
+                      className="text-center w-[45%] px-6 py-3 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-900 dark:text-white rounded-lg transition-colors duration-200 shadow-sm"
+                      onClick={() => {
+                        const shareUrl = `${window.location.origin}?ref=${farcasterUser.fid}`;
+                        navigator.clipboard.writeText(shareUrl);
+                        toast.success('Referral link copied to clipboard!', {
+                          duration: 2000,
+                          position: 'bottom-center',
+                        });
+                      }}
+                    >
+                      Copy Referral Link
+                    </button>
+                  </>
+                )}
+              </div>
             </div>
           </div>
         )}
@@ -548,7 +561,10 @@ function App() {
   };
 
   const handleModalOpen = () => setModalOpen(true);
-  const handleModalClose = () => setModalOpen(false);
+  const handleModalClose = () => {
+    setModalOpen(false);
+    console.log('Modal closed via handleModalClose');
+  };
 
   return (
     <AuthKitProvider
@@ -602,7 +618,10 @@ function App() {
       <section id="faq">
         <FAQ />
       </section>
-      <WaitlistModal open={modalOpen} onClose={handleModalClose} setModalOpen={setModalOpen} />
+      <WaitlistModal 
+        open={modalOpen} 
+        onClose={handleModalClose}
+      />
       <footer>
         <div className="footer-content">
           <div className="footer-icons">

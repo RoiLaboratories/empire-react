@@ -1,0 +1,36 @@
+.share-modal {
+  max-width: 500px !important;
+}
+
+.share-options {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  margin-top: 1.5rem;
+}
+
+.share-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.share-section h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-color);
+  margin: 0;
+}
+
+.farcaster-share {
+  background: linear-gradient(135deg, #6C47FF 0%, #8A6FFF 100%);
+  color: white !important;
+  text-decoration: none;
+  text-align: center;
+  transition: transform 0.2s ease-in-out;
+}
+
+.farcaster-share:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(108, 71, 255, 0.2);
+}
