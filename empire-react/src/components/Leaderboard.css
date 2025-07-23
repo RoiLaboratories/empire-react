@@ -25,6 +25,20 @@
   color: var(--text-primary);
   font-family: 'Rubik', sans-serif;
   width: 100%;
+  position: relative;
+  padding-bottom: 24px;
+}
+
+.leaderboard .section-title::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80px;
+  height: 4px;
+  background: linear-gradient(90deg, #6C47FF, #5234CC);
+  border-radius: 2px;
 }
 
 .leaderboard .section-subtitle {

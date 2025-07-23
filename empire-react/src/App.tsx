@@ -33,6 +33,7 @@ function WaitlistModal({ open, onClose }: WaitlistModalProps) {
   const [farcasterUser, setFarcasterUser] = useState<FarcasterUser | null>(null);
   const [signInError, setSignInError] = useState('');
   const [referralCount, setReferralCount] = useState<number | null>(null);
+  const [hasJoinedWaitlist, setHasJoinedWaitlist] = useState(false);
 
   const handleSuccess = async (data: any) => {
     if (data && data.fid) {
@@ -50,6 +51,14 @@ function WaitlistModal({ open, onClose }: WaitlistModalProps) {
     console.error('Farcaster sign in error:', error);
     setSignInError('Failed to connect with Farcaster. Please ensure you have a Farcaster account and try again.');
   };
+
+  // Reset modal state when it opens
+  useEffect(() => {
+    if (open) {
+      setHasJoinedWaitlist(false);
+      setSignInError('');
+    }
+  }, [open]);
 
   const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -113,11 +122,8 @@ function WaitlistModal({ open, onClose }: WaitlistModalProps) {
         }
       });
 
-      // Close waitlist modal after a brief delay
-      requestAnimationFrame(() => {
-        onClose();
-        console.log('Waitlist modal closed');
-      });
+      // Set the state to show share buttons instead of closing modal
+      setHasJoinedWaitlist(true);
     } catch (error) {
       console.error('Error submitting to waitlist:', error);
       let errorMessage = 'Failed to join waitlist. Please try again.';
@@ -140,7 +146,7 @@ function WaitlistModal({ open, onClose }: WaitlistModalProps) {
     <div className="modal-bg" onClick={(e) => e.stopPropagation()}>
       <div className="modal-content" onClick={e => e.stopPropagation()}>
         <button className="close-btn" onClick={onClose}>&times;</button>
-        <h2>Join the Waitlist</h2>
+        {/* <h2>Join the Waitlist</h2> */}
         {!farcasterUser ? (
           <div className="farcaster-signin">
             <p className="signin-info">Connect your Farcaster account to join the waitlist</p>
@@ -149,6 +155,48 @@ function WaitlistModal({ open, onClose }: WaitlistModalProps) {
               onError={handleError}
             />
             {signInError && <p className="error-message">{signInError}</p>}
+          </div>
+        ) : hasJoinedWaitlist ? (
+          <div className="success-content">
+            <div className="success-message">
+              <h3>🎉 Welcome to the waitlist!</h3>
+              <p>You've successfully joined the KnowEmpire waitlist, stay tuned for updates!</p>
+            </div>
+            
+            <div className="share-section">
+              <h3>Share with friends to earn more points!</h3>
+              {farcasterUser && referralCount !== null && referralCount > 0 && (
+                <p className="referral-count">You've referred {referralCount} {referralCount === 1 ? 'person' : 'people'} so far!</p>
+              )}
+              {/* <p>Get bonus rewards when your friends join using your referral link</p> */}
+              <div className="share-buttons-container">
+                {farcasterUser && (
+                  <>
+                    <a 
+                      href={`https://warpcast.com/~/compose?text=I%20just%20joined%20the%20@knowempire%20waitlist%20and%20earned%20100%20$KNOW%20points!%20🎉%0A%0AJoin%20now%20using%20my%20referral%20link:%20${window.location.origin}?ref=${farcasterUser.fid}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-center px-4 py-3 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-900 dark:text-white rounded-lg transition-colors duration-200 shadow-sm whitespace-nowrap"
+                    >
+                      Share on Farcaster
+                    </a>
+                    <button 
+                      className="text-center px-4 py-3 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-900 dark:text-white rounded-lg transition-colors duration-200 shadow-sm whitespace-nowrap"
+                      onClick={() => {
+                        const shareUrl = `${window.location.origin}?ref=${farcasterUser.fid}`;
+                        navigator.clipboard.writeText(shareUrl);
+                        toast.success('Referral link copied to clipboard!', {
+                          duration: 2000,
+                          position: 'bottom-center',
+                        });
+                      }}
+                    >
+                      Copy Referral Link
+                    </button>
+                  </>
+                )}
+              </div>
+            </div>
           </div>
         ) : (
           <div>
@@ -189,41 +237,6 @@ function WaitlistModal({ open, onClose }: WaitlistModalProps) {
                 {isSubmitting ? 'Joining...' : 'Join Waitlist'}
               </button>
             </form>
-            
-            <div className="share-section">
-              <h3>Share with friends to earn points!</h3>
-              {farcasterUser && referralCount !== null && referralCount > 0 && (
-                <p className="referral-count">You've referred {referralCount} {referralCount === 1 ? 'person' : 'people'} so far!</p>
-              )}
-              <p>Get bonus rewards when your friends join using your referral link</p>
-              <div className="flex justify-between w-full px-16 mt-6">
-                {farcasterUser && (
-                  <>
-                    <a 
-                      href={`https://warpcast.com/~/compose?text=I%20just%20joined%20the%20@knowempire%20waitlist%20and%20earned%20100%20$KNOW%20points!%20🎉%0A%0AJoin%20now%20using%20my%20referral%20link:%20${window.location.origin}?ref=${farcasterUser.fid}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-center w-[45%] px-6 py-3 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-900 dark:text-white rounded-lg transition-colors duration-200 shadow-sm"
-                    >
-                      Share on Farcaster
-                    </a>
-                    <button 
-                      className="text-center w-[45%] px-6 py-3 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-900 dark:text-white rounded-lg transition-colors duration-200 shadow-sm"
-                      onClick={() => {
-                        const shareUrl = `${window.location.origin}?ref=${farcasterUser.fid}`;
-                        navigator.clipboard.writeText(shareUrl);
-                        toast.success('Referral link copied to clipboard!', {
-                          duration: 2000,
-                          position: 'bottom-center',
-                        });
-                      }}
-                    >
-                      Copy Referral Link
-                    </button>
-                  </>
-                )}
-              </div>
-            </div>
           </div>
         )}
       </div>
@@ -480,10 +493,21 @@ function Navigation({ toggleTheme, isDarkMode }: NavigationProps) {
 
   return (
     <nav className="nav-bar">
-      <div className="nav-content">
+      <div className="mobile-nav">
         <div className="nav-logo">
           <img src={empireLogo} alt="Empire Logo" className="nav-logo-img" />
         </div>
+
+        {/* Mobile Menu Button */}
+        {isMobile && (
+          <button 
+            className="mobile-menu-btn"
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            aria-label="Toggle menu"
+          >
+            ☰
+          </button>
+        )}
 
         {/* Desktop Navigation */}
         {!isMobile && (
@@ -501,31 +525,24 @@ function Navigation({ toggleTheme, isDarkMode }: NavigationProps) {
 
         {/* Mobile Navigation */}
         {isMobile && (
-          <>
-            <button 
-              className="mobile-menu-btn"
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              aria-label="Toggle menu"
-            >
-              {isMenuOpen ? '✕' : '☰'}
-            </button>
-            <div className={`nav-links ${isMenuOpen ? 'nav-open' : ''}`} onClick={() => setIsMenuOpen(false)}>
-              <div className="nav-menu" onClick={(e) => e.stopPropagation()}>
-                <div className="nav-menu-header">
-                  <span className="nav-menu-title">Menu</span>
+          <div className={`mobile-nav-menu ${isMenuOpen ? 'show' : ''}`}>
+              <div className="mobile-nav-content">
+                <div className="menu-header">
+                  <h3>Menu</h3>
                   <button className="mobile-menu-btn" onClick={() => setIsMenuOpen(false)}>✕</button>
                 </div>
+                {/* <button onClick={() => scrollToSection('hero')}>Home</button> */}
                 <button onClick={() => scrollToSection('how-it-works')}>How It Works</button>
                 <button onClick={() => scrollToSection('features')}>Features</button>
                 <button onClick={() => scrollToSection('rewards')}>Rewards</button>
                 <button onClick={() => scrollToSection('top-earners')}>Top Earners</button>
                 <button onClick={() => scrollToSection('faq')}>FAQ</button>
+                <button className="theme-toggle mobile" onClick={toggleTheme} aria-label="Toggle theme">
+                  {isDarkMode ? <FaSun size={20} /> : <FaMoon size={20} />}
+                  <span className="theme-label">{isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}</span>
+                </button>
               </div>
             </div>
-            <button className="theme-toggle mobile" onClick={toggleTheme} aria-label="Toggle theme">
-              {isDarkMode ? <FaSun size={20} /> : <FaMoon size={20} />}
-            </button>
-          </>
         )}
       </div>
     </nav>
@@ -588,7 +605,7 @@ function App() {
       </section>
       <section id="rewards" className="rewards">
         <h2 className="section-title">Empire Rewards</h2>
-        <p className="section-subtitle">Unlock exclusive benefits</p>
+        {/* <p className="section-subtitle">Unlock exclusive benefits</p> */}
         <div className="rewards-grid">
           {[
             {
@@ -599,7 +616,7 @@ function App() {
             {
               title: 'Referral Program',
               subtitle: 'Invite & Earn',
-              description: 'Invite friends and receive a percentage of their rewards.'
+              description: 'Invite friends and receive $KNOW points.'
             },
             {
               title: 'Special Events',

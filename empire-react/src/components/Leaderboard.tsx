@@ -93,7 +93,7 @@ function Leaderboard() {
     return (
       <section id="top-earners" className="leaderboard">
         <h2 className="section-title">Leaderboard</h2>
-        <p className="section-subtitle">Leading the Empire's Growth</p>
+        {/* <p className="section-subtitle">Leading the Empire's Growth</p> */}
         <div className="leaderboard-error">
           <motion.div
             initial={{ opacity: 0 }}
@@ -141,7 +141,7 @@ function Leaderboard() {
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5, delay: 0.2 }}
         >
-          Leading earners and their achievements
+          {/* Leading earners and their achievements */}
         </motion.p>
         {/* Responsive View */}
         {!isMobile ? (
